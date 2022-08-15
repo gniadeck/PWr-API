@@ -14,6 +14,9 @@ Feel free to open any issues.
 Waiting to see your contribution,
 WMS_DEV
 
+# PWr-API sandbox
+We have developed a simple, react based web application that allows you to understand purpose of our project a little bit better, it is available [here](http://pwr-api-sandbox.herokuapp.com/) (polish language), and its source code is available [here](https://github.com/komp15/pwr-api-sandbox)
+
 # General purpose
 As students of Wroclaw's University of Science and technology, we had a lot of ideas for software, that could make university life easier and more modern. The biggest problem with developing it, was going through all the authentication and web-scraping of university systems. We wanted to enable young developers to access internal systems with ease and make developing software for our university much faster. 
 
