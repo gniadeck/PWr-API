@@ -10,7 +10,7 @@
   </parent>  
   <groupId>dev.wms</groupId>  
   <artifactId>pwr-api</artifactId>  
-  <version>0.0.1-SNAPSHOT</version>  
+  <version>1.0.0</version>
   <name>pwr-api</name>  
   <description>Unofficial PWr's api that provides access to all internal university systems at your fingertips.</description>
   <properties> 
