@@ -1,11 +1,15 @@
 # :rocket::rocket: PWr-API :rocket::rocket:
+[![Codacy Badge](https://app.codacy.com/project/badge/Grade/bd8c106b8f4943e28702cbc54ce776b5)](https://www.codacy.com/gh/komp15/PWr-API/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=komp15/PWr-API&amp;utm_campaign=Badge_Grade) 
+[![Development deployment - pwr-api-dev](https://github.com/komp15/PWr-API/actions/workflows/main_pwr-api-dev.yml/badge.svg)](https://github.com/komp15/PWr-API/actions/workflows/main_pwr-api-dev.yml)
+[![Maintenance](https://img.shields.io/badge/Maintained%3F-yes-green.svg)](https://GitHub.com/Naereen/StrapDown.js/graphs/commit-activity)
+[![Status page](https://img.shields.io/badge/StatusPage-UP-<COLOR>.svg)](https://pwr-api-status.wmsdev.pl/)
 
 
 Unofficial PWr's api that integrates polwro, JSOS, edukacja.cl, iparking, eportal and prowadzacy, providing access to all internal university systems at your fingertips.
 
-If you want to become an API-developer, please join our team WMS_DEV on jira (ask @komp15, or @Woojciech for support) or read the code, documentation (https://pwr-api-dev.azurewebsites.net/swagger-ui/index.html), and you can test and use current API build at https://pwr-api-dev.azurewebsites.net/api. 
+If you want to become an API-developer, please join our team WMS_DEV on jira (ask @komp15, or @Woojciech for support) or read the code, documentation (https://pwr-api-dev.azurewebsites.net/swagger-ui/index.html), and you can test and use current API development build at https://pwr-api-dev.azurewebsites.net/api, or use latest stable production verion at http://pwr-api-prod.wmsdev.pl. 
 
-API is hosted on Azure App Services on free tier plan and can be not production ready in terms of hosting. Please consider it when developing applications using it.
+API is hosted DigitalOcean's Droplet and can be not production ready in terms of load. Please consider it when developing applications using it.
 
 If you want to achieve faster responses you can use our code directly in your project, or start up the latest build on your server.
 
@@ -14,8 +18,20 @@ Feel free to open any issues.
 Waiting to see your contribution,
 WMS_DEV
 
+# Useful urls
+* [prod-documentation](http://pwr-api-prod.wmsdev.pl/swagger-ui/index.html)
+* [prod-baseurl](http://pwr-api-prod.wmsdev.pl)
+* [dev-documentation](https://pwr-api-dev.azurewebsites.net/swagger-ui/index.html)
+* [dev-baseurl](https://pwr-api-dev.azurewebsites.net)
+* [sandbox](http://pwr-api-sandbox.herokuapp.com/)
+* [sanbox-repo](https://github.com/komp15/pwr-api-sandbox)
+* [status page](https://pwr-api-status.wmsdev.pl/)
+
 # PWr-API sandbox
 We have developed a simple, react based web application that allows you to understand purpose of our project a little bit better, it is available [here](http://pwr-api-sandbox.herokuapp.com/) (polish language), and its source code is available [here](https://github.com/komp15/pwr-api-sandbox)
+
+# Production usage
+In order to use the API in real life production applications, we strongly reccomend to setup your own enviroment with the latest release of our API. Please remember, that the API is public, and everybody can use it as they want. We provide full support during setup in your enviroment.
 
 # General purpose
 As students of Wroclaw's University of Science and technology, we had a lot of ideas for software, that could make university life easier and more modern. The biggest problem with developing it, was going through all the authentication and web-scraping of university systems. We wanted to enable young developers to access internal systems with ease and make developing software for our university much faster. 
