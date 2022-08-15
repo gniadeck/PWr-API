@@ -1,0 +1,121 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "array",
+  "items": [
+    {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "lastUpdate": {
+          "type": "string"
+        },
+        "leftPlaces": {
+          "type": "integer"
+        },
+        "trend": {
+          "type": "integer"
+        }
+      },
+      "required": [
+        "name",
+        "lastUpdate",
+        "leftPlaces",
+        "trend"
+      ]
+    },
+    {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "lastUpdate": {
+          "type": "string"
+        },
+        "leftPlaces": {
+          "type": "integer"
+        },
+        "trend": {
+          "type": "integer"
+        }
+      },
+      "required": [
+        "name",
+        "lastUpdate",
+        "leftPlaces",
+        "trend"
+      ]
+    },
+    {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "lastUpdate": {
+          "type": "string"
+        },
+        "leftPlaces": {
+          "type": "integer"
+        },
+        "trend": {
+          "type": "integer"
+        }
+      },
+      "required": [
+        "name",
+        "lastUpdate",
+        "leftPlaces",
+        "trend"
+      ]
+    },
+    {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "lastUpdate": {
+          "type": "string"
+        },
+        "leftPlaces": {
+          "type": "integer"
+        },
+        "trend": {
+          "type": "integer"
+        }
+      },
+      "required": [
+        "name",
+        "lastUpdate",
+        "leftPlaces",
+        "trend"
+      ]
+    },
+    {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "lastUpdate": {
+          "type": "string"
+        },
+        "leftPlaces": {
+          "type": "integer"
+        },
+        "trend": {
+          "type": "integer"
+        }
+      },
+      "required": [
+        "name",
+        "lastUpdate",
+        "leftPlaces",
+        "trend"
+      ]
+    }
+  ]
+}
