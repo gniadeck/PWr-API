@@ -23,7 +23,7 @@ WMS_DEV
 * [prod-baseurl](http://pwr-api-prod.wmsdev.pl)
 * [dev-documentation](https://pwr-api-dev.azurewebsites.net/swagger-ui/index.html)
 * [dev-baseurl](https://pwr-api-dev.azurewebsites.net)
-* [sandbox](http://pwr-api-sandbox.herokuapp.com/)
+* [sandbox](http://sandbox.pwrapi.wmsdev.pl/)
 * [sanbox-repo](https://github.com/komp15/pwr-api-sandbox)
 * [status page](https://pwr-api-status.wmsdev.pl/)
 
