@@ -28,7 +28,7 @@ WMS_DEV
 * [status page](https://pwr-api-status.wmsdev.pl/)
 
 # PWr-API sandbox
-We have developed a simple, react based web application that allows you to understand purpose of our project a little bit better, it is available [here](http://pwr-api-sandbox.herokuapp.com/) (polish language), and its source code is available [here](https://github.com/komp15/pwr-api-sandbox)
+We have developed a simple, react based web application that allows you to understand purpose of our project a little bit better, it is available [here](http://sandbox.pwrapi.wmsdev.pl/) (polish language), and its source code is available [here](https://github.com/komp15/pwr-api-sandbox)
 
 # Production usage
 In order to use the API in real life production applications, we strongly reccomend to setup your own enviroment with the latest release of our API. Please remember, that the API is public, and everybody can use it as they want. We provide full support during setup in your enviroment.
