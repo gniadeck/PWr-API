@@ -6,6 +6,7 @@ import java.util.List;
 import com.fasterxml.jackson.core.JsonProcessingException;
 
 import dev.wms.pwrapi.dto.parking.Parking;
+import dev.wms.pwrapi.dto.parking.ParkingWithHistory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -27,7 +28,7 @@ public class ParkingServiceImpl implements ParkingService {
     }
 
     @Override
-    public String getRawParkingData() throws IOException{
+    public List<ParkingWithHistory> getRawParkingData() throws IOException{
         return parkingDAO.getRawParkingData();
     }
 

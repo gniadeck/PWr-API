@@ -1,9 +1,10 @@
 package dev.wms.pwrapi.dao.parking;
 
 import dev.wms.pwrapi.dto.parking.Parking;
+import dev.wms.pwrapi.dto.parking.ParkingWithHistory;
 
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.List;
 
 public interface ParkingDAO {
     /**
@@ -11,12 +12,12 @@ public interface ParkingDAO {
      * @return List of parking objects
      * @throws IOException When deserialization goes wrong
      */
-    ArrayList<Parking> getProcessedParkingInfo() throws IOException;
+    List<Parking> getProcessedParkingInfo() throws IOException;
 
     /**
      * Returns unprocessed response from server. Works like proxy
      * @return JSON Response from server
      * @throws IOException When deserialization goes wrong
      */
-    String getRawParkingData() throws IOException;
+    List<ParkingWithHistory> getRawParkingData() throws IOException;
 }
