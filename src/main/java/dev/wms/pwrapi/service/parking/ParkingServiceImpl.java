@@ -7,29 +7,26 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 
 import dev.wms.pwrapi.dto.parking.Parking;
 import dev.wms.pwrapi.dto.parking.ParkingWithHistory;
+import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import dev.wms.pwrapi.dao.parking.ParkingDAO;
 
 @Service
+@AllArgsConstructor
 public class ParkingServiceImpl implements ParkingService {
 
-    private ParkingDAO parkingDAO;
-
-    @Autowired
-    public ParkingServiceImpl(ParkingDAO parkingDAO){
-        this.parkingDAO = parkingDAO;
-    }
+    private ParkingProxy parkingProxy;
 
     @Override
     public List<Parking> getParkingData() throws JsonProcessingException, IOException{
-        return parkingDAO.getProcessedParkingInfo();
+        return parkingProxy.getParkingState();
     }
 
     @Override
     public List<ParkingWithHistory> getRawParkingData() throws IOException{
-        return parkingDAO.getRawParkingData();
+        return parkingProxy.getParkingWithHistory();
     }
 
 }
