@@ -17,6 +17,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -32,6 +33,7 @@ import javax.validation.constraints.Min;
 
 @RestController
 @RequestMapping(value = "/api/jsos", produces = "application/json")
+@Validated
 public class JsosAPI {
 
     private JsosService jsosService;
@@ -43,13 +45,13 @@ public class JsosAPI {
 
     @GetMapping("/wiadomosci/{page}/tresc")
     @Operation(summary = "Returns full messages with given id from one page")
-    public ResponseEntity<List<JsosMessageFull>> getStudentsMessage(String login, String password, @PathVariable int page, Integer... ids) throws IOException {
+    public ResponseEntity<List<JsosMessageFull>> getStudentsMessage(String login, String password, @PathVariable @Min(1) int page, Integer... ids) throws IOException {
         return ResponseEntity.status(HttpStatus.OK).body(jsosService.getStudentMessage(login, password, page, ids));
     }
 
     @GetMapping("/wiadomosci/{page}")
     @Operation(summary = "Return all students messages from the given page")
-    public ResponseEntity<List<JsosMessageShort>> getStudentsMessages(String login, String password, @PathVariable int page) throws IOException {
+    public ResponseEntity<List<JsosMessageShort>> getStudentsMessages(String login, String password, @PathVariable @Min(1) int page) throws IOException {
         return ResponseEntity.status(HttpStatus.OK).body(jsosService.getStudentMessagesList(login, password, page));
     }
 

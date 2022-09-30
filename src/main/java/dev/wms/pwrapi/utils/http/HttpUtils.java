@@ -1,5 +1,6 @@
 package dev.wms.pwrapi.utils.http;
 
+import dev.wms.pwrapi.utils.generalExceptions.SystemTimeoutException;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -7,6 +8,7 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
 import java.io.IOException;
+import java.net.SocketTimeoutException;
 
 public class HttpUtils {
 
@@ -27,6 +29,8 @@ public class HttpUtils {
 
         try(Response response = client.newCall(financeRequest).execute()){
             responseString = response.body().string();
+        } catch (SocketTimeoutException e){
+            throw new SystemTimeoutException();
         }
 
         return Jsoup.parse(responseString);
