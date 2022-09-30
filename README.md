@@ -72,7 +72,7 @@ All the reviews are stored in our database, and can be accessed using an API. In
 This API can get you access to central university system. You can get all information about a given student, get his marks, courses, and even lesson plan for given week. Implementation is based on HTTP requests, where authentication is handled with our custom logic for simulating OAuth.
 
 # Parking API
-This simple and very useful module allows you to get a current state of PWr's public parkings. Its implementation is based on reverse engineering a website. The first endpoint (/api/parking) returns response from API mapped for our custom and simple objects. The raw endpoint on the other hand, simply makes a request to the server and returns it in the same form (we just act like a proxy).
+This simple and very useful module allows you to get a current state of PWr's public parkings. Its implementation is based on reverse engineering a website. The first endpoint (/api/parking) returns response from API mapped for our custom and simple objects. The raw endpoint on the other hand, returns parkings with array of historic status of available places. This changed after PWr's migration to skd service. Please be aware, that trend field will always be zero, because of that migration. In the second version of the API this field will be removed.
 
 # Prowadzacy API
 Prowadzacy API is an API for prowadzacy.pwr.edu.pl, this mostly unknown site, allows you to get plan of teacher, get plan for given room, or even get all lessons in a course. It has a couple of limitations when speaking of querying because of website design (we tried to describe it best as we can in swagger docs), but still can be used in very interesting ways.
