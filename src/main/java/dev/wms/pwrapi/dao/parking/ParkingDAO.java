@@ -15,7 +15,7 @@ public interface ParkingDAO {
     List<Parking> getProcessedParkingInfo() throws IOException;
 
     /**
-     * Returns unprocessed response from server. Works like proxy
+     * Returns parking information and array containing history of parking places for the last 24 hours
      * @return JSON Response from server
      * @throws IOException When deserialization goes wrong
      */

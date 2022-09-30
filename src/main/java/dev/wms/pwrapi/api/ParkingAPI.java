@@ -25,7 +25,7 @@ public class ParkingAPI {
     private ParkingService parkingService;
 
     @GetMapping
-    @Operation(summary = "Returns processed data from iparking.pwr.edu.pl", description = "You can use it to get data from iparking.pwr.edu.pl in simple format")
+    @Operation(summary = "Returns processed data from skd.pwr.edu.pl", description = "You can use it to get data from skd.pwr.edu.pl in simple format")
     public ResponseEntity<List<Parking>> getProcessedParkingInfo() throws JsonProcessingException, IOException{
         List<Parking> result = parkingService.getParkingData();
         return ResponseEntity.status(HttpStatus.OK).body(result);
@@ -33,8 +33,8 @@ public class ParkingAPI {
     }
 
     @GetMapping("/raw")
-    @Operation(summary = "Returns raw request data from iparking.pwr.edu.pl",
-            description = "You can use it to get raw, unprocessed data from iparking.pwr.edu.pl Especially useful when you want to graph parking usage")
+    @Operation(summary = "Returns history data from skd.pwr.edu.pl",
+            description = "You can use it to get parking history data from last 24h")
     public ResponseEntity<List<ParkingWithHistory>> getRawParkingInfo() throws IOException{
         return ResponseEntity.status(HttpStatus.OK).body(parkingService.getRawParkingData());
     }

@@ -1,15 +1,12 @@
 package dev.wms.pwrapi.parking;
 
-import dev.wms.pwrapi.api.ParkingAPI;
 import io.restassured.http.ContentType;
-import io.restassured.module.mockmvc.RestAssuredMockMvc;
 
-import org.junit.jupiter.api.BeforeAll;
+import org.hamcrest.Matcher;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import static io.restassured.RestAssured.*;
-import static io.restassured.matcher.RestAssuredMatchers.*;
 import static io.restassured.module.jsv.JsonSchemaValidator.matchesJsonSchemaInClasspath;
 import static org.hamcrest.Matchers.*;
 
@@ -51,10 +48,34 @@ public class ParkingTests {
 
     @Test
     public void responseTypeShouldBeJSON(){
-
         get("api/parking").then()
                 .contentType(ContentType.JSON);
+    }
 
+    @Test
+    public void detailsEndpointShouldContainAllParkingNames(){
+
+        get("api/parking/raw").then()
+                .body("[0].name", oneOf("D20", "Parking Wrońskiego", "C13", "Geocentrum", "Architektura"))
+                .body("[1].name", oneOf("D20", "Parking Wrońskiego", "C13", "Geocentrum", "Architektura"))
+                .body("[2].name", oneOf("D20", "Parking Wrońskiego", "C13", "Geocentrum", "Architektura"))
+                .body("[3].name", oneOf("D20", "Parking Wrońskiego", "C13", "Geocentrum", "Architektura"))
+                .body("[4].name", oneOf("D20", "Parking Wrońskiego", "C13", "Geocentrum", "Architektura"));
+
+    }
+
+    @Test
+    public void historyEndpointShouldBeAnArrayWrappedInString(){
+        get("api/parking/raw").then()
+                .body("[0].history", getArrayMatcher())
+                .body("[1].history", getArrayMatcher())
+                .body("[2].history", getArrayMatcher())
+                .body("[3].history", getArrayMatcher())
+                .body("[4].history", getArrayMatcher());
+    }
+
+    private Matcher<String> getArrayMatcher(){
+        return allOf(startsWith("["), endsWith("]"), not(containsString("(")), not(containsString(")")));
     }
 
 

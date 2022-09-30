@@ -9,19 +9,23 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import dev.wms.pwrapi.dto.parking.ParkingWithHistory;
+import dev.wms.pwrapi.utils.http.HttpUtils;
 import org.jetbrains.annotations.NotNull;
-import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.springframework.stereotype.Repository;
 
 import dev.wms.pwrapi.dto.parking.Parking;
 import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
 
 @Repository
 public class ParkingDAOImpl implements ParkingDAO {
+
+    public static final String PARKING_WRONSKIEGO = "Parking Wrońskiego";
+    public static final String C_13 = "C13";
+    public static final String D_20 = "D20";
+    public static final String GEOCENTRUM = "Geocentrum";
+    public static final String ARCHITEKTURA = "Architektura";
 
     @Override
     public List<Parking> getProcessedParkingInfo() throws IOException{
@@ -36,38 +40,22 @@ public class ParkingDAOImpl implements ParkingDAO {
     private Document fetchParkingWebsite() throws IOException {
         OkHttpClient client = new OkHttpClient().newBuilder()
                 .build();
-        Request request = new Request.Builder()
-                .url("https://skd.pwr.edu.pl/")
-                .addHeader("sec-ch-ua", "\"Google Chrome\";v=\"105\", \"Not)A;Brand\";v=\"8\", \"Chromium\";v=\"105\"")
-                .addHeader("sec-ch-ua-mobile", "?0")
-                .addHeader("sec-ch-ua-platform", "\"macOS\"")
-                .addHeader("Upgrade-Insecure-Requests", "1")
-                .addHeader("User-Agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/105.0.0.0 Safari/537.36")
-                .addHeader("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9")
-                .addHeader("Sec-Fetch-Site", "same-origin")
-                .addHeader("Sec-Fetch-Mode", "navigate")
-                .addHeader("Sec-Fetch-User", "?1")
-                .addHeader("Sec-Fetch-Dest", "document")
-                .addHeader("host", "skd.pwr.edu.pl")
-                .build();
-        Response response = client.newCall(request).execute();
-        return Jsoup.parse(response.body().string());
+        return HttpUtils.makeRequestWithClientAndGetDocument(client, "https://skd.pwr.edu.pl/");
     }
 
     private List<Parking> parseProcessed(Element page){
         List<Parking> result = new ArrayList<>();
          Matcher matcher = Pattern.compile("\"type\":\"put\",\"key\":\"text\",\"feat\":7,\"value\":\"\\d+").matcher(page.html());
          matcher.find();
-
-        result.add(new Parking("Parking Wrońskiego", getMeasurmentTime(), getPlacesFromResponse(matcher), 0));
+        result.add(new Parking(PARKING_WRONSKIEGO, getMeasurmentTime(), getPlacesFromResponse(matcher), 0));
         matcher.find();
-        result.add(new Parking("C13", getMeasurmentTime(), getPlacesFromResponse(matcher), 0));
+        result.add(new Parking(C_13, getMeasurmentTime(), getPlacesFromResponse(matcher), 0));
         matcher.find();
-        result.add(new Parking("D20", getMeasurmentTime(), getPlacesFromResponse(matcher), 0));
+        result.add(new Parking(D_20, getMeasurmentTime(), getPlacesFromResponse(matcher), 0));
         matcher.find();
-        result.add(new Parking("Geocentrum", getMeasurmentTime(), getPlacesFromResponse(matcher), 0));
+        result.add(new Parking(GEOCENTRUM, getMeasurmentTime(), getPlacesFromResponse(matcher), 0));
         matcher.find();
-        result.add(new Parking("Architektura", getMeasurmentTime(), getPlacesFromResponse(matcher), 0));
+        result.add(new Parking(ARCHITEKTURA, getMeasurmentTime(), getPlacesFromResponse(matcher), 0));
 
         return result;
     }
@@ -76,17 +64,21 @@ public class ParkingDAOImpl implements ParkingDAO {
         List<ParkingWithHistory> result = new ArrayList<>();
         Matcher matcher = Pattern.compile("(?<=\\\\\"data\\\\\":\\[)(.*?)(?=\\])").matcher(page.html());
         matcher.find();
-        result.add(new ParkingWithHistory("Parking Wrońskiego", getMeasurmentTime(), matcher.group()));
+        result.add(new ParkingWithHistory(PARKING_WRONSKIEGO, getMeasurmentTime(), sanitizeArray(matcher.group())));
         matcher.find();
-        result.add(new ParkingWithHistory("C13", getMeasurmentTime(), matcher.group()));
+        result.add(new ParkingWithHistory(C_13, getMeasurmentTime(), sanitizeArray(matcher.group())));
         matcher.find();
-        result.add(new ParkingWithHistory("D20", getMeasurmentTime(), matcher.group()));
+        result.add(new ParkingWithHistory(D_20, getMeasurmentTime(), sanitizeArray(matcher.group())));
         matcher.find();
-        result.add(new ParkingWithHistory("Geocentrum", getMeasurmentTime(), matcher.group()));
+        result.add(new ParkingWithHistory(GEOCENTRUM, getMeasurmentTime(), sanitizeArray(matcher.group())));
         matcher.find();
-        result.add(new ParkingWithHistory("Architektura", getMeasurmentTime(), matcher.group()));
+        result.add(new ParkingWithHistory(ARCHITEKTURA, getMeasurmentTime(), sanitizeArray(matcher.group())));
 
         return result;
+    }
+
+    private String sanitizeArray(String array){
+        return "[" + array + "]";
     }
 
     @NotNull
