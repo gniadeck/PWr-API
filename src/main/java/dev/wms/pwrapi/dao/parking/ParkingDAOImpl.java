@@ -1,9 +1,6 @@
 package dev.wms.pwrapi.dao.parking;
 
 import java.io.IOException;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
@@ -12,6 +9,7 @@ import java.util.regex.Pattern;
 
 import dev.wms.pwrapi.dto.parking.ParkingWithHistory;
 import dev.wms.pwrapi.utils.http.HttpUtils;
+import dev.wms.pwrapi.utils.parking.ParkingDateUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -85,8 +83,7 @@ public class ParkingDAOImpl implements ParkingDAO {
 
     @NotNull
     private String getMeasurmentTime() {
-        return ZonedDateTime.now()
-                .withZoneSameInstant(ZoneId.of("Europe/Warsaw"))
+        return ParkingDateUtils.getDateTimeInPoland()
                 .format(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
     }
 
