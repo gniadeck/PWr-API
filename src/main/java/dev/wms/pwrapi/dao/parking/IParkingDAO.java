@@ -26,7 +26,6 @@ import okhttp3.RequestBody;
 import okhttp3.Response;
 
 @Repository
-@Primary
 public class IParkingDAO implements ParkingDAO {
 
 
@@ -109,11 +108,12 @@ public class IParkingDAO implements ParkingDAO {
         mapper.configure(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY, true);
         ParkingWithHistoryResponse parkingWithHistoryResponses = mapper.readValue(stringResponse, ParkingWithHistoryResponse.class);
         List<ParkingWithHistory> result = new ArrayList<>();
+        DateTimeFormatter parkingFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         for(ParkingWithHistoryArrayElement parking : parkingWithHistoryResponses.getPlaces()){
 
             ParkingWithHistory toAdd = ParkingWithHistory.builder()
                     .name(ParkingGeneralUtils.determineParking(parking.getParking_id()))
-                    .lastUpdate(parking.getCzas_pomiaru())
+                    .lastUpdate(LocalDateTime.parse(parking.getCzas_pomiaru(), parkingFormatter).toString())
                     .history(parseHistory(parking.getChart().getX(), parking.getChart().getData()).toString().replace("{","").replace("}", ""))
                     .build();
             result.add(toAdd);

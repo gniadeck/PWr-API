@@ -15,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class ParkingDAOTest {
 
     @Autowired
-    private ParkingDAO parkingDAO;
+    private ParkingDAO SKDParkingDAO;
 
     /**
      * Because of migration to SKD service, trend feature is no longer supported, and trend should be equal
@@ -23,8 +23,8 @@ public class ParkingDAOTest {
      * @throws IOException
      */
     @Test
-    public void trendShouldAlwaysBeZero() throws IOException {
-        List<Parking> result = parkingDAO.getProcessedParkingInfo();
+    public void trendShouldAlwaysBeZeroFOr() throws IOException {
+        List<Parking> result = SKDParkingDAO.getProcessedParkingInfo();
         for(Parking parking : result){
             assertEquals(0, parking.getTrend());
         }

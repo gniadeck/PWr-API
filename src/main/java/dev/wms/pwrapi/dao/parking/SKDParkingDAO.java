@@ -19,7 +19,7 @@ import dev.wms.pwrapi.dto.parking.Parking;
 import okhttp3.OkHttpClient;
 
 @Repository
-public class ParkingDAOImpl implements ParkingDAO {
+public class SKDParkingDAO implements ParkingDAO {
 
     public static final String PARKING_WRONSKIEGO = "Parking Wrońskiego";
     public static final String C_13 = "C13";
