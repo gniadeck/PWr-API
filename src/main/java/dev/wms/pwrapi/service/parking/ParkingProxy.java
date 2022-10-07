@@ -3,6 +3,7 @@ package dev.wms.pwrapi.service.parking;
 import dev.wms.pwrapi.dao.parking.ParkingDAO;
 import dev.wms.pwrapi.dto.parking.Parking;
 import dev.wms.pwrapi.dto.parking.ParkingWithHistory;
+import dev.wms.pwrapi.utils.parking.ParkingDateUtils;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -38,16 +39,18 @@ public class ParkingProxy {
     }
 
     private boolean parkingStateQualifies(List<Parking> parkingState){
-       return parkingState == null || parkingState.isEmpty() || parseUpdateTime(parkingState.get(0).getLastUpdate()).isBefore(LocalDateTime.now().minusMinutes(1));
+       return parkingState == null || parkingState.isEmpty() || parseUpdateTime(parkingState.get(0).getLastUpdate())
+               .isBefore(ParkingDateUtils.getDateTimeInPoland().minusMinutes(1));
     }
 
     private boolean parkingStateWithHistoryQualifiesForUpdate(List<ParkingWithHistory> parkingWithHistoryState){
-        return parkingState == null || parkingWithHistoryState.isEmpty() || parseUpdateTime(parkingWithHistoryState.get(0).getLastUpdate()).isBefore(LocalDateTime.now().minusMinutes(1));
+        return parkingState == null || parkingWithHistoryState.isEmpty() || parseUpdateTime(parkingWithHistoryState.get(0).getLastUpdate()).isBefore(
+                ParkingDateUtils.getDateTimeInPoland().minusMinutes(1)
+        );
     }
 
     private LocalDateTime parseUpdateTime(String lastUpdate){
         return LocalDateTime.parse(lastUpdate, DateTimeFormatter.ISO_LOCAL_DATE_TIME);
     }
-
 
 }
