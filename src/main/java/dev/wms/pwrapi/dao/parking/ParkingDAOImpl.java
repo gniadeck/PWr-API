@@ -2,6 +2,8 @@ package dev.wms.pwrapi.dao.parking;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
@@ -83,7 +85,9 @@ public class ParkingDAOImpl implements ParkingDAO {
 
     @NotNull
     private String getMeasurmentTime() {
-        return LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+        return ZonedDateTime.now()
+                .withZoneSameInstant(ZoneId.of("Europe/Warsaw"))
+                .format(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
     }
 
     private int getPlacesFromResponse(Matcher matcher) {
