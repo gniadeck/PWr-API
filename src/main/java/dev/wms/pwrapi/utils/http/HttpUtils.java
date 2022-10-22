@@ -12,6 +12,14 @@ import java.net.SocketTimeoutException;
 
 public class HttpUtils {
 
+    public static String makeRequestWithClientAndGetString(OkHttpClient client, Request request){
+        try(Response response = client.newCall(request).execute()){
+            return response.body().string();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     /**
      * Makes request with OkHttp's client and parses it to Jsoup's Document. Needed for proper response closing
      * @param client OkHttp client which will execute the request

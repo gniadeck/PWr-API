@@ -1,5 +1,7 @@
 package dev.wms.pwrapi.utils.parking;
 
+import java.util.Set;
+
 public class ParkingGeneralUtils {
 
     /**
@@ -29,6 +31,10 @@ public class ParkingGeneralUtils {
 
         return "Unknown parking id: " + id;
 
+    }
+
+    public static Set<Integer> getParkingIds(){
+        return Set.of(5,4,2,6,7);
     }
 
 }
