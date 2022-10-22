@@ -51,7 +51,7 @@ public class ParkingProxy {
 
     private boolean parkingStateWithHistoryQualifiesForUpdate(List<ParkingWithHistory> parkingWithHistoryState){
         return parkingWithHistoryState == null || parkingWithHistoryState.isEmpty() || parseUpdateTime(parkingWithHistoryState.get(0).getLastUpdate()).isBefore(
-                ParkingDateUtils.getDateTimeInPoland().minusMinutes(1)
+                ParkingDateUtils.getDateTimeInPoland().minusMinutes(5)
         );
     }
 

@@ -28,6 +28,10 @@ public class ParkingArrayElement {
     @JsonProperty("liczba_miejsc")
     private String liczba_miejsc;
     @JsonProperty("trend")
-    private String trend; 
+    private String trend;
+    @JsonProperty("nazwa")
+    private String nazwa;
+    @JsonProperty("symbol")
+    private String symbol;
     
 }

@@ -1,13 +1,16 @@
 package dev.wms.pwrapi.dto.parking.deserialization;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import dev.wms.pwrapi.dto.parking.DataWithLabels;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
 
 @Data
 @NoArgsConstructor
 public class ParkingWithHistoryResponse {
     private int success;
-    private List<ParkingWithHistoryArrayElement> places;
+    private DataWithLabels slots;
+    @JsonIgnore
+    private Integer parkingId;
 }
