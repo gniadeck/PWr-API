@@ -32,6 +32,7 @@ public class GeneralAdvice {
     @Order(Ordered.LOWEST_PRECEDENCE)
     public ResponseEntity<ExceptionMessagingDTO> handleGeneralException(Throwable t){
         log.info("Handling unexpected exception " + t);
+        t.printStackTrace();
         return ResponseEntity.status(500).body(new ExceptionMessagingDTO(t.getMessage()));
     }
 
