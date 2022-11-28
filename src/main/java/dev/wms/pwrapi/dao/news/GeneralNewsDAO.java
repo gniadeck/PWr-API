@@ -11,11 +11,20 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Locale;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @Repository
 public class GeneralNewsDAO {
+
+    private final DateTimeFormatter rssFormatter = DateTimeFormatter.ofPattern("dd MMM yyyy", Locale.ENGLISH);
+    private final DateTimeFormatter goalFormatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
+    private final Pattern datePattern = Pattern.compile("\\d{2} [a-zA-Z]{3} \\d{4}");
 
     public Channel parsePwrRSS(String rssUrl) {
         OkHttpClient client = new OkHttpClient();
@@ -28,10 +37,19 @@ public class GeneralNewsDAO {
 
         try {
             Rss items = xmlMapper.readValue(response, Rss.class);
+            for(Item item : items.getChannel().getItem()) reformatDate(item);
+
             return items.getChannel();
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private void reformatDate(Item item){
+        Matcher matcher = datePattern.matcher(item.getPubDate());
+        matcher.find();
+        LocalDate parsedDate = LocalDate.parse(matcher.group(), rssFormatter);
+        item.setPubDate(parsedDate.format(goalFormatter));
     }
 
     public Channel getFacultyNews(FacultyType faculty) {
@@ -47,6 +65,7 @@ public class GeneralNewsDAO {
         Document document = HttpUtils.makeRequestWithClientAndGetDocument(client, url);
 
         Elements newsBoxes = document.getElementsByClass("news-box");
+        newsBoxes.removeIf(box -> box.text().isEmpty());
 
         List<Item> channelItems = newsBoxes.parallelStream()
                 .map(newsBox -> parseItem(newsBox, url))
