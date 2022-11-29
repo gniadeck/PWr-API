@@ -17,10 +17,9 @@ import java.util.List;
 import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 @Repository
-public class GeneralNewsDAO {
+public class NewsDAO {
 
     private final DateTimeFormatter rssFormatter = DateTimeFormatter.ofPattern("dd MMM yyyy", Locale.ENGLISH);
     private final DateTimeFormatter goalFormatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
