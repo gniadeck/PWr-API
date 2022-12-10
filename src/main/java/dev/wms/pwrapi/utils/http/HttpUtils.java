@@ -20,6 +20,19 @@ public class HttpUtils {
         }
     }
 
+    public static String makeRequestWithClientAndGetString(OkHttpClient client, String url){
+
+        Request request = new Request.Builder()
+                .url(url)
+                .build();
+
+        try(Response response = client.newCall(request).execute()){
+            return response.body().string();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     /**
      * Makes request with OkHttp's client and parses it to Jsoup's Document. Needed for proper response closing
      * @param client OkHttp client which will execute the request
@@ -27,7 +40,7 @@ public class HttpUtils {
      * @return Jsoup's Document containing parsed html from OkHttp response
      * @throws IOException when parsing goes wrong
      */
-    public static Document makeRequestWithClientAndGetDocument(OkHttpClient client, String url) throws IOException {
+    public static Document makeRequestWithClientAndGetDocument(OkHttpClient client, String url)  {
 
         Request financeRequest = new Request.Builder()
                 .url(url)
@@ -39,6 +52,8 @@ public class HttpUtils {
             responseString = response.body().string();
         } catch (SocketTimeoutException e){
             throw new SystemTimeoutException();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
 
         return Jsoup.parse(responseString);
