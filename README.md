@@ -77,6 +77,9 @@ This simple and very useful module allows you to get a current state of PWr's pu
 # Prowadzacy API
 Prowadzacy API is an API for prowadzacy.pwr.edu.pl, this mostly unknown site, allows you to get plan of teacher, get plan for given room, or even get all lessons in a course. It has a couple of limitations when speaking of querying because of website design (we tried to describe it best as we can in swagger docs), but still can be used in very interesting ways.
 
+# News API
+News API is a feature introduced in PWr-API 1.1.0. The module is able to scrape news from main Politechnika's website and all of the faculties websites. Its implementation is based on scraping RSS feeds, and usual webscraping, if no RSS is supported. 
+
 
 # Conclusion and license
 Thank you very much for showing your interest in our project. If you want, you can leave a star on it, or just simply use it and share your projects with us! We are waiting for your input. Feel free to open issues, pull requests, and use it as you want.
