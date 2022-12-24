@@ -20,6 +20,7 @@ public class ForumServiceImpl implements ForumService {
         this.forumDAO = forumDAOImpl;
     }
 
+
     @Override
     public DatabaseMetadataDTO getDatabaseMetadata() {
         int totalTeachers = forumDAO.getNumberOfTeachers();

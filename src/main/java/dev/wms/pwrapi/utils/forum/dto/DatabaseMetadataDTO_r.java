@@ -9,9 +9,9 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class DatabaseMetadataDTO {
+public class DatabaseMetadataDTO_r {
 
-    private int totalTeachers;
-    private int totalReviews;
+    private Long totalTeachers;
+    private Long totalReviews;
     private String latestRefresh;
 }
