@@ -10,8 +10,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class DatabaseMetadataDTO {
-
-    private int totalTeachers;
-    private int totalReviews;
+    private Integer totalTeachers;
+    private Integer totalReviews;
     private String latestRefresh;
 }
