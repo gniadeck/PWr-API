@@ -1,6 +1,8 @@
 package dev.wms.pwrapi.api;
 
 import dev.wms.pwrapi.entity.forum.Review_r;
+import dev.wms.pwrapi.entity.forum.TeacherWithReviewsDTO;
+import dev.wms.pwrapi.entity.forum.Teacher_r;
 import dev.wms.pwrapi.service.forum.ForumService_r;
 import dev.wms.pwrapi.utils.forum.dto.DatabaseMetadataDTO_r;
 import io.swagger.v3.oas.annotations.Operation;
@@ -34,7 +36,7 @@ public class ForumAPI_r {
 
     @GetMapping("/opinie/{reviewId}")
     @Operation(summary = "Returns review with specified id.")
-    public ResponseEntity<Review_r> getReviewById(@PathVariable @Positive Long reviewId) {
+    public ResponseEntity<Review_r> getReviewById(@PathVariable @Positive(message = "reviewId has to be >= 0") Long reviewId) {
         return ResponseEntity.of(forumService.getReviewById(reviewId));
     }
 
@@ -42,5 +44,12 @@ public class ForumAPI_r {
     @Operation(summary = "Returns total number of teachers.")
     public ResponseEntity<DatabaseMetadataDTO_r> getTotalTeachers() {
         return ResponseEntity.ok(forumService.getTotalTeachers());
+    }
+
+    @GetMapping(value = "/prowadzacy/{teacherId}")
+    @Operation(summary = "Returns teacher with specified id.")
+    public ResponseEntity<TeacherWithReviewsDTO> getTeacherWithReviews(@PathVariable @Positive (message = "teacherId has to be >= 0")
+                                                             Long teacherId) {
+        return ResponseEntity.ok(forumService.getTeacherWithAllReviews(teacherId));
     }
 }

@@ -1,18 +1,19 @@
 package dev.wms.pwrapi.service.forum;
 
-import dev.wms.pwrapi.entity.forum.Review_r;
+import dev.wms.pwrapi.entity.forum.*;
 import dev.wms.pwrapi.repository.DatabaseMetadataRepository;
 import dev.wms.pwrapi.repository.ReviewRepository;
 import dev.wms.pwrapi.repository.TeacherRepository;
-import dev.wms.pwrapi.utils.forum.dto.DatabaseMetadataDTO;
 import dev.wms.pwrapi.utils.forum.dto.DatabaseMetadataDTO_r;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
 @Service
 @AllArgsConstructor
+@Slf4j
 public class ForumService_r {
 
     private final DatabaseMetadataRepository databaseMetadataRepository;
@@ -40,4 +41,26 @@ public class ForumService_r {
         databaseMetadataDTO.setTotalTeachers(teacherRepository.getTotalNumberOfTeachers());
         return databaseMetadataDTO;
     }
+
+    public TeacherWithReviewsDTO getTeacherWithAllReviews(Long teacherId){
+        //checkIfTeacherExists(teacherId);
+        TeacherInfoDTO teacherInfo = teacherRepository.getTeacherInfo(teacherId);
+        log.info("TEACHER:" + teacherInfo);
+        return TeacherWithReviewsDTO.builder()
+                .teacherId(teacherInfo.getTeacherId())
+                .category(teacherInfo.getCategory())
+                .academicTitle(teacherInfo.getAcademicTitle())
+                .fullName(teacherInfo.getFullName())
+                .averageRating(teacherInfo.getAverageRating())
+                .reviews(reviewRepository.getTeacherReviews(teacherId))
+                .build();
+    }
+
+    private void checkIfTeacherExists(Long teacherId){
+        if(!teacherRepository.existsById(teacherId)){
+            // TODO -> 404 status code
+            throw new RuntimeException("teacher does not exist :)");
+        }
+    }
+
 }

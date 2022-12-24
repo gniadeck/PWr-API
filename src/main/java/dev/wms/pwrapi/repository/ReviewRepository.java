@@ -7,6 +7,7 @@ import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;
 
 import java.util.Optional;
+import java.util.Set;
 
 public interface ReviewRepository extends PagingAndSortingRepository<Review_r, Long> {
 
@@ -23,4 +24,9 @@ public interface ReviewRepository extends PagingAndSortingRepository<Review_r, L
             "FROM teacher t " +
             "WHERE t.teacher_id = (SELECT teacher_id FROM review r WHERE r.review_id = :reviewId)")
     Teacher_r getReviewRecipent(@Param("reviewId") Long reviewId);
+
+    @Query("SELECT review_id, course_name, given_rating, title, review, reviewer, post_date " +
+            "FROM review r " +
+            "WHERE r.teacher_id = :teacherId")
+    Set<Review_r> getTeacherReviews(@Param("teacherId") Long teacherId);
 }
