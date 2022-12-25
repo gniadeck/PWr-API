@@ -4,22 +4,20 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import dev.wms.pwrapi.entity.forum.Review_r;
 import dev.wms.pwrapi.entity.forum.Teacher;
 import dev.wms.pwrapi.entity.forum.TeacherWithReviewsDTO;
-import dev.wms.pwrapi.entity.forum.Teacher_r;
 import dev.wms.pwrapi.service.forum.ForumService_r;
+import dev.wms.pwrapi.utils.forum.consts.Category;
 import dev.wms.pwrapi.utils.forum.dto.DatabaseMetadataDTO_r;
-import dev.wms.pwrapi.utils.forum.exceptions.InvalidLimitException;
-import dev.wms.pwrapi.utils.forum.exceptions.TeacherNotFoundByFullNameException;
-import dev.wms.pwrapi.utils.forum.exceptions.TeacherNotFoundByIdException;
-import dev.wms.pwrapi.utils.generalExceptions.InvalidIdException;
+import dev.wms.pwrapi.utils.forum.exceptions.CategoryMembersNotFoundException;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.AllArgsConstructor;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/forum_r")
@@ -56,26 +54,28 @@ public class ForumAPI_r {
     @Operation(summary = "Returns teacher with specified id.")
     public ResponseEntity<TeacherWithReviewsDTO> getTeacherWithReviews(@PathVariable @Positive (message = "teacherId has to be >= 0")
                                                              Long teacherId) {
-        return ResponseEntity.ok(forumService.getTeacherWithAllReviews(teacherId));
+        return ResponseEntity.ok(forumService.getTeacherWithAllReviewsById(teacherId));
     }
 
     @GetMapping("/prowadzacy/szukajId")
     @Operation(summary = "Returns certain teacher specified by id and limited number of reviews.",
             description = "Maximal number of fetched reviews is specified by the limit parameter, set limit = -1 to " +
                     "fetch all available reviews.")
-    public ResponseEntity<TeacherWithReviewsDTO> getTeacherWithLimitedReviews(
+    public ResponseEntity<TeacherWithReviewsDTO> getTeacherWithLimitedReviewsById(
                                 @RequestParam("teacherId") @Positive (message = "teacherId has to be >= 0") Long teacherId,
-                                @RequestParam("limit") @Min(value = -1, message = "limit has to be >= -1")Long limit) {
-        return ResponseEntity.ok(forumService.getTeacherWithLimitedReviews(teacherId, limit));
+                                @RequestParam("limit") @Min(value = -1, message = "limit has to be >= -1") Long limit) {
+        return ResponseEntity.ok(forumService.getTeacherWithLimitedReviewsById(teacherId, limit));
     }
 
     @GetMapping("/prowadzacy/szukajImie")
     @Operation(summary = "Returns certain teacher specified by full name and limited number of reviews.",
             description = "Parameters firstName and lastName are interchangeable, query is based on pattern matching. " +
                     "Maximal number of reviews is specified by the limit parameter, set limit = -1 to fetch all available reviews.")
-    public ResponseEntity<Teacher> fetchTeacherReviewsByFullName(@RequestParam("firstName") String firstName,
-                                                                 @RequestParam("lastName") String lastName,
-                                                                 @RequestParam("limit") Long limit) {
+    public ResponseEntity<TeacherWithReviewsDTO> getTeacherWithLimitedReviewsByFullName(
+                                @RequestParam("firstName") @NotNull(message = "firstName is required") String firstName,
+                                @RequestParam("lastName") @NotNull(message = "lastName is required") String lastName,
+                                @RequestParam("limit") @Min(value = -1, message = "limit has to be >= -1") Long limit) {
+        /*
         if(limit >= -1){
             try {
                 Teacher response = forumService.fetchLimitedTeacherReviewsByFullName(firstName, lastName, limit);
@@ -86,5 +86,20 @@ public class ForumAPI_r {
         }else{
             throw new InvalidLimitException(limit);
         }
+        */
+        return ResponseEntity.ok(forumService.getTeacherWithLimitedReviewsByFullName(firstName, lastName, limit));
+    }
+
+    @GetMapping("/prowadzacy/kategoria/{category}")
+    @Operation(summary = "Returns all teachers who belong to the specified category.")
+    public ResponseEntity<List<Teacher>> getTeachersByCategory(@PathVariable Category category) {
+        /*
+        List<Teacher> response = forumService.getTeachersByCategory(category);
+        if(response.isEmpty()){
+            throw new CategoryMembersNotFoundException(category);
+        }
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+         */
+        return null;
     }
 }

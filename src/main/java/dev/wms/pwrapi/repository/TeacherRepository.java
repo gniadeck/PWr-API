@@ -16,4 +16,12 @@ public interface TeacherRepository extends PagingAndSortingRepository<Teacher_r,
             "FROM teacher t " +
             "WHERE t.teacher_id = :teacherId")
     TeacherInfoDTO getTeacherInfo(@Param("teacherId") Long teacherId);
+
+    @Query("SELECT teacher_id " +
+            "FROM teacher " +
+            "WHERE " +
+            "full_name LIKE '%':firstName'%':lastName'%' " +
+            "OR " +
+            "full_name LIKE '%':lastName'%':firstName'%'")
+    Long getTeacherIdByFullName(@Param("firstName") String firstName, @Param("lastName") String lastName);
 }

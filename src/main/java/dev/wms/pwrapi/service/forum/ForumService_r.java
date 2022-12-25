@@ -5,6 +5,8 @@ import dev.wms.pwrapi.repository.DatabaseMetadataRepository;
 import dev.wms.pwrapi.repository.ReviewRepository;
 import dev.wms.pwrapi.repository.TeacherRepository;
 import dev.wms.pwrapi.utils.forum.dto.DatabaseMetadataDTO_r;
+import dev.wms.pwrapi.utils.forum.exceptions.TeacherNotFoundByIdException;
+import dev.wms.pwrapi.utils.forum.exceptions.TeacherNotFoundException;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -43,33 +45,29 @@ public class ForumService_r {
     }
 
     // TODO -> fix
-    public TeacherWithReviewsDTO getTeacherWithAllReviews(Long teacherId){
+    public TeacherWithReviewsDTO getTeacherWithAllReviewsById(Long teacherId){
         //checkIfTeacherExists(teacherId);
-        TeacherInfoDTO teacherInfo = teacherRepository.getTeacherInfo(teacherId);
-        return TeacherWithReviewsDTO.builder()
-                .teacherId(teacherInfo.getTeacherId())
-                .category(teacherInfo.getCategory())
-                .academicTitle(teacherInfo.getAcademicTitle())
-                .fullName(teacherInfo.getFullName())
-                .averageRating(teacherInfo.getAverageRating())
-                .reviews(reviewRepository.getTeacherReviews(teacherId))
-                .build();
+        TeacherWithReviewsDTO teacherInfo = getTeacherInfo(teacherId);
+        teacherInfo.setReviews(reviewRepository.getTeacherReviews(teacherId));
+        return teacherInfo;
     }
 
-    private void checkIfTeacherExists(Long teacherId){
-        if(!teacherRepository.existsById(teacherId)){
-            /*
-            // TODO -> 404 status code
-            throw new RuntimeException("teacher does not exist :)");
-            */
-        }
-    }
-
-    public TeacherWithReviewsDTO getTeacherWithLimitedReviews(Long teacherId, Long limit){
-//        checkIfTeacherExists(teacherId);
+    public TeacherWithReviewsDTO getTeacherWithLimitedReviewsById(Long teacherId, Long limit){
         if(limit == -1){
-            return getTeacherWithAllReviews(teacherId);
+            return getTeacherWithAllReviewsById(teacherId);
         }
+//        checkIfTeacherExistsById(teacherId);
+        TeacherWithReviewsDTO teacherInfo = getTeacherInfo(teacherId);
+        teacherInfo.setReviews(reviewRepository.getTeacherReviewsLimited(teacherId, limit));
+        return teacherInfo;
+    }
+
+    public TeacherWithReviewsDTO getTeacherWithLimitedReviewsByFullName(String firstName, String lastName, Long limit){
+        Long teacherId = getTeacherIdByFullName(firstName, lastName);
+        return getTeacherWithLimitedReviewsById(teacherId, limit);
+    }
+
+    private TeacherWithReviewsDTO getTeacherInfo(Long teacherId){
         TeacherInfoDTO teacherInfo = teacherRepository.getTeacherInfo(teacherId);
         return TeacherWithReviewsDTO.builder()
                 .teacherId(teacherInfo.getTeacherId())
@@ -77,8 +75,23 @@ public class ForumService_r {
                 .academicTitle(teacherInfo.getAcademicTitle())
                 .fullName(teacherInfo.getFullName())
                 .averageRating(teacherInfo.getAverageRating())
-                .reviews(reviewRepository.getTeacherReviewsLimited(teacherId, limit))
                 .build();
+    }
+
+    private void checkIfTeacherExistsById(Long teacherId){
+        if(!teacherRepository.existsById(teacherId)){
+            throw new TeacherNotFoundException(teacherId);
+        }
+    }
+    private Long getTeacherIdByFullName(String firstName, String lastName){
+        /*
+        Long teacherId = teacherRepository.getTeacherIdByFullName(firstName, lastName);
+        if(teacherId == null){
+            throw new RuntimeException("teacher not present!");
+        }
+        return teacherId;
+        */
+        return teacherRepository.getTeacherIdByFullName(firstName, lastName);
     }
 
 }
