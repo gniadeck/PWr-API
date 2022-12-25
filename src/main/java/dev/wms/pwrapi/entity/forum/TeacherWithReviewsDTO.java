@@ -6,7 +6,6 @@ import org.springframework.data.annotation.Id;
 
 import java.util.Set;
 
-
 @Builder
 @Data
 public class TeacherWithReviewsDTO {

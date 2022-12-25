@@ -42,10 +42,10 @@ public class ForumService_r {
         return databaseMetadataDTO;
     }
 
+    // TODO -> fix
     public TeacherWithReviewsDTO getTeacherWithAllReviews(Long teacherId){
         //checkIfTeacherExists(teacherId);
         TeacherInfoDTO teacherInfo = teacherRepository.getTeacherInfo(teacherId);
-        log.info("TEACHER:" + teacherInfo);
         return TeacherWithReviewsDTO.builder()
                 .teacherId(teacherInfo.getTeacherId())
                 .category(teacherInfo.getCategory())
@@ -58,9 +58,27 @@ public class ForumService_r {
 
     private void checkIfTeacherExists(Long teacherId){
         if(!teacherRepository.existsById(teacherId)){
+            /*
             // TODO -> 404 status code
             throw new RuntimeException("teacher does not exist :)");
+            */
         }
+    }
+
+    public TeacherWithReviewsDTO getTeacherWithLimitedReviews(Long teacherId, Long limit){
+//        checkIfTeacherExists(teacherId);
+        if(limit == -1){
+            return getTeacherWithAllReviews(teacherId);
+        }
+        TeacherInfoDTO teacherInfo = teacherRepository.getTeacherInfo(teacherId);
+        return TeacherWithReviewsDTO.builder()
+                .teacherId(teacherInfo.getTeacherId())
+                .category(teacherInfo.getCategory())
+                .academicTitle(teacherInfo.getAcademicTitle())
+                .fullName(teacherInfo.getFullName())
+                .averageRating(teacherInfo.getAverageRating())
+                .reviews(reviewRepository.getTeacherReviewsLimited(teacherId, limit))
+                .build();
     }
 
 }

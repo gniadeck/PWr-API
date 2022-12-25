@@ -1,5 +1,6 @@
 package dev.wms.pwrapi.entity.forum;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
 import org.springframework.data.annotation.Id;
@@ -16,6 +17,7 @@ public class Review_r {
     private String title;
     private String review;
     private String reviewer;
+    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
     private LocalDateTime postDate;
     private Teacher_r teacher;
 }

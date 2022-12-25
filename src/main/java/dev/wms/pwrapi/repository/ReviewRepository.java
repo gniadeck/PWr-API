@@ -6,6 +6,7 @@ import org.springframework.data.jdbc.repository.query.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -29,4 +30,10 @@ public interface ReviewRepository extends PagingAndSortingRepository<Review_r, L
             "FROM review r " +
             "WHERE r.teacher_id = :teacherId")
     Set<Review_r> getTeacherReviews(@Param("teacherId") Long teacherId);
+
+    @Query("SELECT review_id, course_name, given_rating, title, review, reviewer, post_date " +
+            "FROM review r " +
+            "WHERE r.teacher_id = :teacherId " +
+            "LIMIT :limit")
+    Set<Review_r> getTeacherReviewsLimited(@Param("teacherId") Long teacherId, @Param("limit") Long limit);
 }
