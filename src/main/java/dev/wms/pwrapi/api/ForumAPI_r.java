@@ -34,15 +34,15 @@ public class ForumAPI_r {
     }
 
     @GetMapping("/opinie")
-    @Operation(summary = "Returns total number of reviews.")
+    @Operation(summary = "Returns total number of teacher reviews collected.")
     public ResponseEntity<DatabaseMetadataDTO_r> getTotalReviews() {
         return ResponseEntity.ok(forumService.getTotalReviews());
     }
 
     @GetMapping("/opinie/{reviewId}")
-    @Operation(summary = "Returns review with specified id.")
+    @Operation(summary = "Returns review with specified reviewId.")
     public ResponseEntity<Review_r> getReviewById(@PathVariable @Positive(message = "reviewId has to be >= 0") Long reviewId) {
-        return ResponseEntity.of(forumService.getReviewById(reviewId));
+        return ResponseEntity.ok(forumService.getReviewById(reviewId));
     }
 
     @GetMapping("/prowadzacy")

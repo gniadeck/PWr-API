@@ -40,6 +40,12 @@ public interface TeacherRepository extends PagingAndSortingRepository<Teacher_r,
     @Query("SELECT teacher_id, category, academic_title, full_name, average_rating " +
             "FROM teacher t " +
             "WHERE t.category = :category " +
+            "ORDER BY average_rating ASC")
+    Set<TeacherInfoDTO> getWorstTeachersOfCategory(@Param("category") String category);
+
+    @Query("SELECT teacher_id, category, academic_title, full_name, average_rating " +
+            "FROM teacher t " +
+            "WHERE t.category = :category " +
             "ORDER BY average_rating ASC " +
             "LIMIT :limit")
     Set<TeacherInfoDTO> getWorstTeachersOfCategoryLimited(@Param("category") String category,

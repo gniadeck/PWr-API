@@ -49,7 +49,7 @@ public class ForumAPI {
             Review result = forumService.getReviewById(reviewId);
             return ResponseEntity.status(HttpStatus.OK).body(result);
         }catch (EmptyResultDataAccessException e){
-            throw new ReviewNotFoundException(reviewId);
+            throw new ReviewNotFoundException((long) reviewId);
         }
     }
 
