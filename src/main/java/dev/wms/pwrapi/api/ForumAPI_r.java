@@ -3,9 +3,9 @@ package dev.wms.pwrapi.api;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import dev.wms.pwrapi.entity.forum.Review_r;
 import dev.wms.pwrapi.entity.forum.Teacher;
+import dev.wms.pwrapi.entity.forum.TeacherInfoDTO;
 import dev.wms.pwrapi.entity.forum.TeacherWithReviewsDTO;
 import dev.wms.pwrapi.service.forum.ForumService_r;
-import dev.wms.pwrapi.utils.forum.consts.Category;
 import dev.wms.pwrapi.utils.forum.dto.DatabaseMetadataDTO_r;
 import dev.wms.pwrapi.utils.forum.exceptions.CategoryMembersNotFoundException;
 import io.swagger.v3.oas.annotations.Operation;
@@ -18,6 +18,7 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 import java.util.List;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/api/forum_r")
@@ -92,7 +93,8 @@ public class ForumAPI_r {
 
     @GetMapping("/prowadzacy/kategoria/{category}")
     @Operation(summary = "Returns all teachers who belong to the specified category.")
-    public ResponseEntity<List<Teacher>> getTeachersByCategory(@PathVariable Category category) {
+    public ResponseEntity<Set<TeacherInfoDTO>> getTeachersByCategory(
+                                            @PathVariable @NotNull(message = "category is required") String category) {
         /*
         List<Teacher> response = forumService.getTeachersByCategory(category);
         if(response.isEmpty()){
@@ -100,6 +102,53 @@ public class ForumAPI_r {
         }
         return ResponseEntity.status(HttpStatus.OK).body(response);
          */
-        return null;
+        return ResponseEntity.ok(forumService.getTeachersInfoByCategory(category));
+    }
+
+    @GetMapping("/prowadzacy/ranking")
+    @Operation(summary = "Returns teachers who belong to the specified category ranked by their average rating.")
+    public ResponseEntity<Set<TeacherInfoDTO>> getTeachersRankedByCategory(@RequestParam("kategoria") String category) {
+        /*
+        List<Teacher> response = forumService.getBestTeachersRankedByCategory(category);
+        if(response.isEmpty()){
+            throw new CategoryMembersNotFoundException(category);
+        }
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+        */
+        return ResponseEntity.ok(forumService.getBestTeachersOfCategory(category));
+    }
+
+    // TODO -> fix limit
+    @GetMapping("/prowadzacy/{category}/ranking/najlepsi")
+    @Operation(summary = "Returns limited number of best rated teachers who belong to the specified category, example reviews are provided.",
+            description = "Number of return teachers is specified by the limit parameter, each teacher has a maximal example of three associated reviews.")
+    public ResponseEntity<Set<TeacherWithReviewsDTO>> getBestRankedTeachersByCategoryWithReviewsLimited(
+            @PathVariable String category, @RequestParam("limit") @Min(-1) Long limit) {
+
+        /*
+        List<Teacher> response = forumService.getBestRankedTeachersByCategoryLimited(category, limit);
+        if(response.isEmpty()){
+            throw new CategoryMembersNotFoundException(category);
+        }
+
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+        */
+        return ResponseEntity.ok(forumService.getLimitedBestTeachersOfCategoryWithExampleReviews(category, limit));
+    }
+
+    // TODO -> fix limit
+    @GetMapping("/prowadzacy/{category}/ranking/najgorsi")
+    @Operation(summary = "Returns limited number of worst rated teachers who belong to the specified category, example reviews are provided.",
+            description = "Number of return teachers is specified by the limit parameter, each teacher has a maximal example of three associated reviews.")
+    public ResponseEntity<Set<TeacherWithReviewsDTO>> getWorstRankedTeachersByCategoryWithReviewsLimited(
+            @PathVariable String category, @RequestParam("limit") @Min(-1) Long limit) {
+        /*
+        List<Teacher> response = forumService.getWorstRankedTeachersByCategoryLimited(category, limit);
+        if(response.isEmpty()){
+            throw new CategoryMembersNotFoundException(category);
+        }
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+        */
+        return ResponseEntity.ok(forumService.getLimitedWorstTeachersOfCategoryWithExampleReviews(category, limit));
     }
 }
