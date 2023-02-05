@@ -30,7 +30,6 @@ import okhttp3.Response;
 public class EportalDAO {
 
     public String login(String login, String password) throws IOException, LoginException {
-
         EportalScrapperService.loginToEportal(login, password);
         OkHttpClient client = EportalScrapperService.getClient();
         return client.toString();

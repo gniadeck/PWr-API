@@ -22,6 +22,30 @@ public class EportalScrapperService {
 
     private static OkHttpClient client;
 
+    /**
+     * Method responsible for setting up an OkHttpClient authorized by user data, which is later used in order to
+     * access <i>ePortal</i> information.
+     *
+     * <br><br>
+     *
+     * <i>ePortal</i> authorizes users through <i>JSOS</i> service which requires oauth_consumer_key and oauth_token.
+     * In order to retrieve token and key, a request to <i>https://eportal.pwr.edu.pl/login/index.php?authJSOS=JSOS</i> is sent,
+     * oauth_consumer_key and oauth_token are returned as hidden fields in a html body.
+     *
+     * <br><br>
+     *
+     * Then, an authorization request is sent to <i>https://oauth.pwr.edu.pl/oauth/authenticate?9-1.IFormSubmitListener-authenticateForm</i>
+     * with obtained oauth_customer_key, oauth_token, login and password.
+     *
+     * <br><br>
+     *
+     * If login and password are correct, OkHttpClient is successfully configured, otherwise an LoginException is thrown.
+     * @param login user eportal login
+     * @param password user eportal password
+     * @return
+     * @throws IOException
+     * @throws LoginException when login or password are incorrect
+     */
     public static userDetails loginToEportal(String login, String password) throws IOException {
 
 
