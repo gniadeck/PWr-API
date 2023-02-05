@@ -15,8 +15,8 @@ public interface ReviewRepository extends PagingAndSortingRepository<Review_r, L
     @Query("SELECT COUNT(*) FROM review")
     Long getTotalNumberOfReviews();
 
-    @Query("SELECT review_id AS 'reviewId', course_name AS 'courseName', given_rating AS 'givenRating', title AS 'title'," +
-            " review, reviewer, post_date AS 'postDate' " +
+    @Query("SELECT review_id AS 'review_id', course_name AS 'course_name', given_rating AS 'given_rating', title AS 'title'," +
+            " review, reviewer, post_date AS 'post_date' " +
             "FROM review r " +
             "WHERE r.review_id = :reviewId")
     Optional<Review_r> getReviewWithoutTeacherById(@Param("reviewId") Long reviewId);

@@ -10,5 +10,5 @@ public class Teacher_r {
     private String category;
     private String academicTitle;
     private String fullName;
-    private Double average;
+    private float averageRating;
 }
