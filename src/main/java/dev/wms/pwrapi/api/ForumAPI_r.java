@@ -1,50 +1,51 @@
 package dev.wms.pwrapi.api;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import dev.wms.pwrapi.entity.forum.Review_r;
-import dev.wms.pwrapi.entity.forum.Teacher;
 import dev.wms.pwrapi.entity.forum.TeacherInfoDTO;
 import dev.wms.pwrapi.entity.forum.TeacherWithReviewsDTO;
 import dev.wms.pwrapi.service.forum.ForumService_r;
 import dev.wms.pwrapi.utils.forum.dto.DatabaseMetadataDTO_r;
-import dev.wms.pwrapi.utils.forum.exceptions.CategoryMembersNotFoundException;
 import io.swagger.v3.oas.annotations.Operation;
-import lombok.AllArgsConstructor;
-import org.springframework.http.HttpStatus;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
-import java.util.List;
 import java.util.Set;
 
 @RestController
 @RequestMapping("/api/forum_r")
-@AllArgsConstructor
+@RequiredArgsConstructor
+@Validated
 public class ForumAPI_r {
 
     private final ForumService_r forumService;
 
+    // TODO - think about caching
     @GetMapping
     @Operation(summary = "Returns database metadata such as number of records in each category and latest refresh timestamp.")
     public ResponseEntity<DatabaseMetadataDTO_r> getDatabaseMetadata() {
         return ResponseEntity.ok(forumService.getDatabaseMetadata());
     }
 
+    // TODO - think about caching
     @GetMapping("/opinie")
     @Operation(summary = "Returns total number of teacher reviews collected.")
     public ResponseEntity<DatabaseMetadataDTO_r> getTotalReviews() {
         return ResponseEntity.ok(forumService.getTotalReviews());
     }
 
+    // TODO -> emtpy return instead of exception in case review is not found
     @GetMapping("/opinie/{reviewId}")
     @Operation(summary = "Returns review with specified reviewId.")
-    public ResponseEntity<Review_r> getReviewById(@PathVariable @Positive(message = "reviewId has to be >= 0") Long reviewId) {
+    public ResponseEntity<Review_r> getReviewById(@PathVariable @Positive(message = "reviewId powinno być >= 0") Long reviewId) {
         return ResponseEntity.ok(forumService.getReviewById(reviewId));
     }
 
+    // TODO -> think about caching
     @GetMapping("/prowadzacy")
     @Operation(summary = "Returns total number of teachers.")
     public ResponseEntity<DatabaseMetadataDTO_r> getTotalTeachers() {
@@ -53,8 +54,8 @@ public class ForumAPI_r {
 
     @GetMapping(value = "/prowadzacy/{teacherId}")
     @Operation(summary = "Returns teacher with specified id.")
-    public ResponseEntity<TeacherWithReviewsDTO> getTeacherWithReviews(@PathVariable @Positive (message = "teacherId has to be >= 0")
-                                                             Long teacherId) {
+    public ResponseEntity<TeacherWithReviewsDTO> getTeacherWithReviews(
+                                        @PathVariable @Positive (message = "teacherId powinno być >= 0") Long teacherId) {
         return ResponseEntity.ok(forumService.getTeacherWithAllReviewsById(teacherId));
     }
 
@@ -63,8 +64,8 @@ public class ForumAPI_r {
             description = "Maximal number of fetched reviews is specified by the limit parameter, set limit = -1 to " +
                     "fetch all available reviews.")
     public ResponseEntity<TeacherWithReviewsDTO> getTeacherWithLimitedReviewsById(
-                                @RequestParam("teacherId") @Positive (message = "teacherId has to be >= 0") Long teacherId,
-                                @RequestParam("limit") @Min(value = -1, message = "limit has to be >= -1") Long limit) {
+                                @RequestParam("teacherId") @Positive (message = "teacherId powinno być >= 0") Long teacherId,
+                                @RequestParam("limit") @Min(value = -1, message = "limit powinien być >= -1") Long limit) {
         return ResponseEntity.ok(forumService.getTeacherWithLimitedReviewsById(teacherId, limit));
     }
 
@@ -73,9 +74,9 @@ public class ForumAPI_r {
             description = "Parameters firstName and lastName are interchangeable, query is based on pattern matching. " +
                     "Maximal number of reviews is specified by the limit parameter, set limit = -1 to fetch all available reviews.")
     public ResponseEntity<TeacherWithReviewsDTO> getTeacherWithLimitedReviewsByFullName(
-                                @RequestParam("firstName") @NotNull(message = "firstName is required") String firstName,
-                                @RequestParam("lastName") @NotNull(message = "lastName is required") String lastName,
-                                @RequestParam("limit") @Min(value = -1, message = "limit has to be >= -1") Long limit) {
+                                @RequestParam("firstName") @NotNull(message = "firstName jest wymagane") String firstName,
+                                @RequestParam("lastName") @NotNull(message = "lastName jest wymagane") String lastName,
+                                @RequestParam("limit") @Min(value = -1, message = "limit powinien być >= -1") Long limit) {
         /*
         if(limit >= -1){
             try {
@@ -94,7 +95,7 @@ public class ForumAPI_r {
     @GetMapping("/prowadzacy/kategoria/{category}")
     @Operation(summary = "Returns all teachers who belong to the specified category.")
     public ResponseEntity<Set<TeacherInfoDTO>> getTeachersByCategory(
-                                            @PathVariable @NotNull(message = "category is required") String category) {
+                                            @PathVariable @NotNull(message = "kategoria jest wymagana") String category) {
         /*
         List<Teacher> response = forumService.getTeachersByCategory(category);
         if(response.isEmpty()){

@@ -12,10 +12,10 @@ import java.util.Set;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class TeacherWithReviewsDTO {
     @Id
-    private Long teacherId;
+    private Long id;
     private String category;
     private String academicTitle;
     private String fullName;
-    private Double averageRating;
+    private float average;
     private Set<Review_r> reviews;
 }

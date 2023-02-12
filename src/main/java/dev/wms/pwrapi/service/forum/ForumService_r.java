@@ -4,7 +4,7 @@ import dev.wms.pwrapi.entity.forum.*;
 import dev.wms.pwrapi.repository.DatabaseMetadataRepository;
 import dev.wms.pwrapi.repository.ReviewRepository;
 import dev.wms.pwrapi.repository.TeacherRepository;
-import dev.wms.pwrapi.utils.forum.consts.Category;
+
 import static dev.wms.pwrapi.utils.forum.consts.Category.*;
 
 import dev.wms.pwrapi.utils.forum.dto.DatabaseMetadataDTO_r;
@@ -29,51 +29,67 @@ public class ForumService_r {
     private final TeacherRepository teacherRepository;
     private final Long WORST_AND_BEST_TEACHERS_REVIEW_LIMIT = 3L;
     private final Set<String> categories =
-            Set.of(MATEMATYCY.name(), FIZYCY.name(), INFORMATYCY.name(), CHEMICY.name(), ELEKTRONICY.name(), JEZYKOWCY.name(),
-                    SPORTOWCY.name(), HUMANISCI.name(), INNI.name());
+            Set.of(
+                    MATEMATYCY.name(), FIZYCY.name(), INFORMATYCY.name(), CHEMICY.name(), ELEKTRONICY.name(),
+                    JEZYKOWCY.name(), SPORTOWCY.name(), HUMANISCI.name(), INNI.name()
+            );
 
     public DatabaseMetadataDTO_r getDatabaseMetadata() {
         return databaseMetadataRepository.getDatabaseMetadata();
     }
 
     public DatabaseMetadataDTO_r getTotalReviews() {
-        DatabaseMetadataDTO_r databaseMetadataDTO = new DatabaseMetadataDTO_r();
-        databaseMetadataDTO.setTotalReviews(reviewRepository.getTotalNumberOfReviews());
-        return databaseMetadataDTO;
+        return DatabaseMetadataDTO_r.builder()
+                .totalReviews(reviewRepository.getTotalNumberOfReviews())
+                .build();
     }
 
     public Review_r getReviewById(Long reviewId) {
         Optional<Review_r> review = reviewRepository.getReviewWithoutTeacherById(reviewId);
-        review.ifPresentOrElse(r -> {
-            r.setTeacher(reviewRepository.getReviewRecipent(reviewId));
-        }, () -> {
-            throw new ReviewNotFoundException(reviewId);
-        });
+        review.ifPresentOrElse(
+                r -> r.setTeacher(reviewRepository.getReviewRecipient(reviewId)),
+                () -> {
+                    throw new ReviewNotFoundException(reviewId);
+                });
         return review.get();
     }
 
     public DatabaseMetadataDTO_r getTotalTeachers() {
-        DatabaseMetadataDTO_r databaseMetadataDTO = new DatabaseMetadataDTO_r();
-        databaseMetadataDTO.setTotalTeachers(teacherRepository.getTotalNumberOfTeachers());
-        return databaseMetadataDTO;
+        return DatabaseMetadataDTO_r.builder()
+                .totalTeachers(teacherRepository.getTotalNumberOfTeachers())
+                .build();
     }
 
-    // TODO -> fix
     public TeacherWithReviewsDTO getTeacherWithAllReviewsById(Long teacherId){
-        //checkIfTeacherExists(teacherId);
-        TeacherWithReviewsDTO teacherInfo = getTeacherInfo(teacherId);
-        teacherInfo.setReviews(reviewRepository.getTeacherReviews(teacherId));
-        return teacherInfo;
+        return teacherRepository.getTeacherInfo(teacherId)
+                .map(t -> {
+                    return TeacherWithReviewsDTO.builder()
+                            .id(t.getTeacherId())
+                            .category(t.getCategory())
+                            .academicTitle(t.getAcademicTitle())
+                            .fullName(t.getFullName())
+                            .average(t.getAverageRating())
+                            .reviews(reviewRepository.getTeacherReviews(t.getTeacherId()))
+                            .build();
+                })
+                .orElseThrow(() -> new TeacherNotFoundException(teacherId));
     }
 
     public TeacherWithReviewsDTO getTeacherWithLimitedReviewsById(Long teacherId, Long limit){
-        if(limit == -1){
-            return getTeacherWithAllReviewsById(teacherId);
-        }
-//        checkIfTeacherExistsById(teacherId);
-        TeacherWithReviewsDTO teacherInfo = getTeacherInfo(teacherId);
-        teacherInfo.setReviews(reviewRepository.getTeacherReviewsLimited(teacherId, limit));
-        return teacherInfo;
+        return limit == - 1
+                ? getTeacherWithAllReviewsById(teacherId)
+                : teacherRepository.getTeacherInfo(teacherId)
+                    .map(t -> {
+                        return TeacherWithReviewsDTO.builder()
+                                .id(t.getTeacherId())
+                                .category(t.getCategory())
+                                .academicTitle(t.getAcademicTitle())
+                                .fullName(t.getFullName())
+                                .average(t.getAverageRating())
+                                .reviews(reviewRepository.getTeacherReviewsLimited(teacherId, limit))
+                                .build();
+                    })
+                    .orElseThrow(() -> new TeacherNotFoundException(teacherId));
     }
 
     public TeacherWithReviewsDTO getTeacherWithLimitedReviewsByFullName(String firstName, String lastName, Long limit){
@@ -81,16 +97,18 @@ public class ForumService_r {
         return getTeacherWithLimitedReviewsById(teacherId, limit);
     }
 
-    private TeacherWithReviewsDTO getTeacherInfo(Long teacherId){
-        TeacherInfoDTO teacherInfo = teacherRepository.getTeacherInfo(teacherId);
+    /*
+    private TeacherWithReviewsDTO fetchTeacherReviews(TeacherInfoDTO teacherInfo){
         return TeacherWithReviewsDTO.builder()
                 .teacherId(teacherInfo.getTeacherId())
                 .category(teacherInfo.getCategory())
                 .academicTitle(teacherInfo.getAcademicTitle())
                 .fullName(teacherInfo.getFullName())
                 .averageRating(teacherInfo.getAverageRating())
+                .reviews(reviewRepository.getTeacherReviews(teacherInfo.getTeacherId()))
                 .build();
     }
+    */
 
     public Set<TeacherInfoDTO> getTeachersInfoByCategory(String category){
         checkIfCategoryExists(category.toUpperCase());
@@ -106,11 +124,11 @@ public class ForumService_r {
         checkIfCategoryExists(category);
         return getBestTeachersInfoByCategoryLimited(category, limit).stream()
                     .map(teacherInfo -> TeacherWithReviewsDTO.builder()
-                            .teacherId(teacherInfo.getTeacherId())
+                            .id(teacherInfo.getTeacherId())
                             .category(teacherInfo.getCategory())
                             .academicTitle(teacherInfo.getAcademicTitle())
                             .fullName(teacherInfo.getFullName())
-                            .averageRating(teacherInfo.getAverageRating())
+                            .average(teacherInfo.getAverageRating())
                             .reviews(reviewRepository.getTeacherReviewsLimited(teacherInfo.getTeacherId(),
                                     WORST_AND_BEST_TEACHERS_REVIEW_LIMIT))
                             .build()
@@ -129,11 +147,11 @@ public class ForumService_r {
         checkIfCategoryExists(category);
         return getWorstTeachersInfoByCategoryLimited(category, limit).stream()
                 .map(teacherInfo -> TeacherWithReviewsDTO.builder()
-                        .teacherId(teacherInfo.getTeacherId())
+                        .id(teacherInfo.getTeacherId())
                         .category(teacherInfo.getCategory())
                         .academicTitle(teacherInfo.getAcademicTitle())
                         .fullName(teacherInfo.getFullName())
-                        .averageRating(teacherInfo.getAverageRating())
+                        .average(teacherInfo.getAverageRating())
                         .reviews(reviewRepository.getTeacherReviewsLimited(teacherInfo.getTeacherId(),
                                 WORST_AND_BEST_TEACHERS_REVIEW_LIMIT))
                         .build()

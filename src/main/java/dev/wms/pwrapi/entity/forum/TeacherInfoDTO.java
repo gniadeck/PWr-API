@@ -10,5 +10,5 @@ public class TeacherInfoDTO {
     private String category;
     private String academicTitle;
     private String fullName;
-    private Double averageRating;
+    private float averageRating;
 }

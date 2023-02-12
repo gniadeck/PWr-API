@@ -1,6 +1,8 @@
 package dev.wms.pwrapi.api;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.List;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -62,7 +64,6 @@ public class EportalAPI {
     @GetMapping("/kursy/{id}/oceny")
     @Operation(summary = "Returns all marks for the given course", description = "You can fetch the course ID using /kursy endpoint")
     public ResponseEntity<List<MarkSummary>> getEportalOceny(@RequestParam String login, @RequestParam String password, @PathVariable int id) throws JsonProcessingException {
-
         return ResponseEntity.status(HttpStatus.OK).body(eService.getEportalOceny(login, password, id));
     }
 

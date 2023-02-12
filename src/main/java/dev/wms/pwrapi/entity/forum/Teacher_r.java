@@ -6,9 +6,9 @@ import org.springframework.data.annotation.Id;
 @Data
 public class Teacher_r {
     @Id
-    private Long teacherId;
+    private Long id;
     private String category;
     private String academicTitle;
     private String fullName;
-    private float averageRating;
+    private float average;
 }
