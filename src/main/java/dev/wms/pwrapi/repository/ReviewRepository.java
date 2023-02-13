@@ -30,7 +30,7 @@ public interface ReviewRepository extends PagingAndSortingRepository<Review_r, L
             "WHERE r.teacher_id = :teacherId")
     Set<Review_r> getTeacherReviews(@Param("teacherId") Long teacherId);
 
-    @Query("SELECT review_id, course_name, given_rating, title, review, reviewer, post_date " +
+    @Query("SELECT review_id AS 'id', course_name, given_rating, title, review, reviewer, post_date " +
             "FROM review r " +
             "WHERE r.teacher_id = :teacherId " +
             "LIMIT :limit")

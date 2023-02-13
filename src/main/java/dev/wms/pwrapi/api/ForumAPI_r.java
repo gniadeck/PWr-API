@@ -77,63 +77,31 @@ public class ForumAPI_r {
                                 @RequestParam("firstName") @NotNull(message = "firstName jest wymagane") String firstName,
                                 @RequestParam("lastName") @NotNull(message = "lastName jest wymagane") String lastName,
                                 @RequestParam("limit") @Min(value = -1, message = "limit powinien być >= -1") Long limit) {
-        /*
-        if(limit >= -1){
-            try {
-                Teacher response = forumService.fetchLimitedTeacherReviewsByFullName(firstName, lastName, limit);
-                return ResponseEntity.status(HttpStatus.OK).body(response);
-            }catch(EmptyResultDataAccessException e){
-                throw new TeacherNotFoundByFullNameException(firstName, lastName);
-            }
-        }else{
-            throw new InvalidLimitException(limit);
-        }
-        */
         return ResponseEntity.ok(forumService.getTeacherWithLimitedReviewsByFullName(firstName, lastName, limit));
     }
 
     @GetMapping("/prowadzacy/kategoria/{category}")
     @Operation(summary = "Returns all teachers who belong to the specified category.")
     public ResponseEntity<Set<TeacherInfoDTO>> getTeachersByCategory(
-                                            @PathVariable @NotNull(message = "kategoria jest wymagana") String category) {
-        /*
-        List<Teacher> response = forumService.getTeachersByCategory(category);
-        if(response.isEmpty()){
-            throw new CategoryMembersNotFoundException(category);
-        }
-        return ResponseEntity.status(HttpStatus.OK).body(response);
-         */
+                                            @PathVariable String category) {
         return ResponseEntity.ok(forumService.getTeachersInfoByCategory(category));
     }
 
+    //TODO -> add number of reviews (feature)
     @GetMapping("/prowadzacy/ranking")
     @Operation(summary = "Returns teachers who belong to the specified category ranked by their average rating.")
     public ResponseEntity<Set<TeacherInfoDTO>> getTeachersRankedByCategory(@RequestParam("kategoria") String category) {
-        /*
-        List<Teacher> response = forumService.getBestTeachersRankedByCategory(category);
-        if(response.isEmpty()){
-            throw new CategoryMembersNotFoundException(category);
-        }
-        return ResponseEntity.status(HttpStatus.OK).body(response);
-        */
         return ResponseEntity.ok(forumService.getBestTeachersOfCategory(category));
     }
 
     // TODO -> fix limit
     @GetMapping("/prowadzacy/{category}/ranking/najlepsi")
-    @Operation(summary = "Returns limited number of best rated teachers who belong to the specified category, example reviews are provided.",
-            description = "Number of return teachers is specified by the limit parameter, each teacher has a maximal example of three associated reviews.")
+    @Operation(summary = "Returns limited number of best rated teachers who belong to the specified category, " +
+            "example reviews are provided.",
+            description = "Number of return teachers is specified by the limit parameter, each teacher has a maximal " +
+                    "example of three associated reviews.")
     public ResponseEntity<Set<TeacherWithReviewsDTO>> getBestRankedTeachersByCategoryWithReviewsLimited(
-            @PathVariable String category, @RequestParam("limit") @Min(-1) Long limit) {
-
-        /*
-        List<Teacher> response = forumService.getBestRankedTeachersByCategoryLimited(category, limit);
-        if(response.isEmpty()){
-            throw new CategoryMembersNotFoundException(category);
-        }
-
-        return ResponseEntity.status(HttpStatus.OK).body(response);
-        */
+            @PathVariable String category, @RequestParam("limit") @Min(-1) int limit) {
         return ResponseEntity.ok(forumService.getLimitedBestTeachersOfCategoryWithExampleReviews(category, limit));
     }
 
