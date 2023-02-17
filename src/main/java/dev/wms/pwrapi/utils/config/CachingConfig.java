@@ -24,7 +24,7 @@ public class CachingConfig implements CacheManagerCustomizer<ConcurrentMapCacheM
 
     @Override
     public void customize(ConcurrentMapCacheManager cacheManager) {
-        cacheManager.setCacheNames(List.of("pwr-news"));
+        cacheManager.setCacheNames(List.of("pwr-news", "metadata", "reviews", "teachers"));
     }
 
     @CacheEvict(allEntries = true, cacheNames = "pwr-news")

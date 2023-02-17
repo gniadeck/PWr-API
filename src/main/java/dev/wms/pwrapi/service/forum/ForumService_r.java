@@ -108,12 +108,12 @@ public class ForumService_r {
     }
 
     public Set<TeacherInfoDTO> getTeachersInfoByCategory(String category){
-        checkIfCategoryExists(category.toUpperCase());
+        checkIfCategoryExists(category);
         return teacherRepository.getTeachersInfoByCategory(category);
     }
 
     public Set<TeacherInfoDTO> getBestTeachersOfCategory(String category){
-        checkIfCategoryExists(category.toUpperCase());
+        checkIfCategoryExists(category);
         return teacherRepository.getBestTeachersOfCategory(category);
     }
 
@@ -140,13 +140,10 @@ public class ForumService_r {
     }
 
     private Set<TeacherInfoDTO> getBestTeachersInfoByCategoryLimited(String category, int limit){
-        if(limit == -1){
-            return teacherRepository.getBestTeachersOfCategory(category);
-        }
         return teacherRepository.getBestTeachersOfCategoryLimited(category, limit);
     }
 
-    public Set<TeacherWithReviewsDTO> getLimitedWorstTeachersOfCategoryWithExampleReviews(String category, Long limit){
+    public Set<TeacherWithReviewsDTO> getLimitedWorstTeachersOfCategoryWithExampleReviews(String category, int limit){
         checkIfCategoryExists(category);
         return getWorstTeachersInfoByCategoryLimited(category, limit).stream()
                 .map(teacherInfo -> TeacherWithReviewsDTO.builder()
@@ -162,10 +159,7 @@ public class ForumService_r {
                 .collect(Collectors.toSet());
     }
 
-    private Set<TeacherInfoDTO> getWorstTeachersInfoByCategoryLimited(String category, Long limit){
-        if(limit == -1){
-            return teacherRepository.getWorstTeachersOfCategory(category);
-        }
+    private Set<TeacherInfoDTO> getWorstTeachersInfoByCategoryLimited(String category, int limit){
         return teacherRepository.getWorstTeachersOfCategoryLimited(category, limit);
     }
 }

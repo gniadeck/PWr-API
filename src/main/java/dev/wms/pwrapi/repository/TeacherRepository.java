@@ -13,7 +13,7 @@ public interface TeacherRepository extends PagingAndSortingRepository<Teacher_r,
     @Query("SELECT COUNT(*) FROM teacher")
     Long getTotalNumberOfTeachers();
 
-    @Query("SELECT teacher_id, category, academic_title, full_name, average_rating " +
+    @Query("SELECT teacher_id AS 'id', category, academic_title, full_name, average_rating AS 'average' " +
             "FROM teacher t " +
             "WHERE t.teacher_id = :teacherId")
     Optional<TeacherInfoDTO> getTeacherInfo(@Param("teacherId") Long teacherId);
@@ -37,19 +37,19 @@ public interface TeacherRepository extends PagingAndSortingRepository<Teacher_r,
     Set<TeacherInfoDTO> getBestTeachersOfCategoryLimited(@Param("category") String category,
                                                                    @Param("limit") int limit);
 
-    @Query("SELECT teacher_id, category, academic_title, full_name, average_rating " +
+    @Query("SELECT teacher_id AS 'id', category, academic_title, full_name, average_rating AS 'average' " +
             "FROM teacher t " +
             "WHERE t.category = :category " +
             "ORDER BY average_rating ASC")
     Set<TeacherInfoDTO> getWorstTeachersOfCategory(@Param("category") String category);
 
-    @Query("SELECT teacher_id, category, academic_title, full_name, average_rating " +
+    @Query("SELECT teacher_id AS 'id', category, academic_title, full_name, average_rating AS 'average' " +
             "FROM teacher t " +
             "WHERE t.category = :category " +
             "ORDER BY average_rating ASC " +
             "LIMIT :limit")
     Set<TeacherInfoDTO> getWorstTeachersOfCategoryLimited(@Param("category") String category,
-                                                         @Param("limit") Long limit);
+                                                         @Param("limit") int limit);
 
     @Query("SELECT teacher_id " +
             "FROM teacher " +

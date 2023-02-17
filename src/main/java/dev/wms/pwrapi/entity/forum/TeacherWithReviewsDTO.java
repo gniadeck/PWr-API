@@ -9,7 +9,7 @@ import java.util.Set;
 
 @Builder
 @Data
-@JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class TeacherWithReviewsDTO {
     @Id
     private Long id;
