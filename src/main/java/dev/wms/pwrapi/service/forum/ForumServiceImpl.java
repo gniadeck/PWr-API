@@ -54,7 +54,7 @@ public class ForumServiceImpl {
                 });
         return review.get();
     }
-
+    
     public DatabaseMetadataDTO getTotalTeachers() {
         return DatabaseMetadataDTO.builder()
                 .totalTeachers(teacherRepository.getTotalNumberOfTeachers())
