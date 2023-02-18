@@ -17,5 +17,5 @@ public class TeacherWithReviewsDTO {
     private String academicTitle;
     private String fullName;
     private float average;
-    private Set<Review_r> reviews;
+    private Set<Review> reviews;
 }

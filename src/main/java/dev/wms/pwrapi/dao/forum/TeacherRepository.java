@@ -1,7 +1,7 @@
-package dev.wms.pwrapi.repository;
+package dev.wms.pwrapi.dao.forum;
 
 import dev.wms.pwrapi.entity.forum.TeacherInfoDTO;
-import dev.wms.pwrapi.entity.forum.Teacher_r;
+import dev.wms.pwrapi.entity.forum.Teacher;
 import org.springframework.data.jdbc.repository.query.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;
@@ -9,7 +9,7 @@ import org.springframework.data.repository.query.Param;
 import java.util.Optional;
 import java.util.Set;
 
-public interface TeacherRepository extends PagingAndSortingRepository<Teacher_r, Long> {
+public interface TeacherRepository extends PagingAndSortingRepository<Teacher, Long> {
     @Query("SELECT COUNT(*) FROM teacher")
     Long getTotalNumberOfTeachers();
 
