@@ -80,6 +80,13 @@ Prowadzacy API is an API for prowadzacy.pwr.edu.pl, this mostly unknown site, al
 # News API
 News API is a feature introduced in PWr-API 1.1.0. The module is able to scrape news from main Politechnika's website and all of the faculties websites. Its implementation is based on scraping RSS feeds, and usual webscraping, if no RSS is supported. 
 
+# Contributors
+Thanks to our amazing backend team at [@WMS-DEV](https://github.com/WMS-DEV) developing PWr-API, especially:
+[@Woojciech](https://github.com/Woojciech),
+[@MDybek](https://github.com/MDybek),
+[@lukcyn](https://github.com/lukcyn),
+[@Gawron97](https://github.com/Gawron97),
+[@MIK0o0](https://github.com/MIK0o0)
 
 # Conclusion and license
 Thank you very much for showing your interest in our project. If you want, you can leave a star on it, or just simply use it and share your projects with us! We are waiting for your input. Feel free to open issues, pull requests, and use it as you want.
