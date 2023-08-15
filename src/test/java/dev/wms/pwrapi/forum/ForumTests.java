@@ -1,15 +1,6 @@
 package dev.wms.pwrapi.forum;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import dev.wms.pwrapi.entity.forum.Teacher;
-import dev.wms.pwrapi.service.forum.ForumService;
-import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.HttpStatus;
-
-import static io.restassured.RestAssured.*;
-import static org.hamcrest.Matchers.equalTo;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class ForumTests {

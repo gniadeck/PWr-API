@@ -1,11 +1,11 @@
 package dev.wms.pwrapi.entity.forum;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
-import org.springframework.data.annotation.Id;
 
 @Data
-public class Teacher {
-    @Id
+@JsonInclude(JsonInclude.Include.NON_EMPTY)
+public class TeacherInfoDTO {
     private Long id;
     private String category;
     private String academicTitle;

@@ -1,99 +1,164 @@
 package dev.wms.pwrapi.service.forum;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import dev.wms.pwrapi.dao.forum.ForumDAO;
-import dev.wms.pwrapi.dao.forum.ForumDAOImpl;
-import dev.wms.pwrapi.entity.forum.Review;
-import dev.wms.pwrapi.entity.forum.Teacher;
+import dev.wms.pwrapi.entity.forum.*;
+import dev.wms.pwrapi.dao.forum.DatabaseMetadataRepository;
+import dev.wms.pwrapi.dao.forum.ReviewRepository;
+import dev.wms.pwrapi.dao.forum.TeacherRepository;
+
+import static dev.wms.pwrapi.utils.forum.consts.Category.*;
+
 import dev.wms.pwrapi.utils.forum.dto.DatabaseMetadataDTO;
-import org.springframework.beans.factory.annotation.Autowired;
+import dev.wms.pwrapi.utils.forum.exceptions.CategoryMembersNotFoundException;
+import dev.wms.pwrapi.utils.forum.exceptions.ReviewNotFoundException;
+import dev.wms.pwrapi.utils.forum.exceptions.TeacherNotFoundByFullNameException;
+import dev.wms.pwrapi.utils.forum.exceptions.TeacherNotFoundException;
+import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import java.util.List;
+
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
-public class ForumServiceImpl implements ForumService {
+@AllArgsConstructor
+@Slf4j
+public class ForumServiceImpl {
 
-    private final ForumDAO forumDAO;
+    private final DatabaseMetadataRepository databaseMetadataRepository;
+    private final ReviewRepository reviewRepository;
+    private final TeacherRepository teacherRepository;
+    private final Long WORST_AND_BEST_TEACHERS_REVIEW_LIMIT = 3L;
+    private final Set<String> categories =
+            Set.of(
+                    MATEMATYCY.name(), FIZYCY.name(), INFORMATYCY.name(), CHEMICY.name(), ELEKTRONICY.name(),
+                    JEZYKOWCY.name(), SPORTOWCY.name(), HUMANISCI.name(), INNI.name()
+            );
 
-    @Autowired
-    public ForumServiceImpl(ForumDAOImpl forumDAOImpl){
-        this.forumDAO = forumDAOImpl;
-    }
-
-    @Override
     public DatabaseMetadataDTO getDatabaseMetadata() {
-        int totalTeachers = forumDAO.getNumberOfTeachers();
-        int totalReviews = forumDAO.getNumberOfReviews();
-        String latestRefreshDate = forumDAO.getLastRefreshDate();
-        DatabaseMetadataDTO databaseMetadataDTO = new DatabaseMetadataDTO(totalTeachers, totalReviews, latestRefreshDate);
-        return databaseMetadataDTO;
+        return databaseMetadataRepository.getDatabaseMetadata();
     }
 
-    @Override
     public DatabaseMetadataDTO getTotalReviews() {
-        int totalReviews = forumDAO.getNumberOfReviews();
-        DatabaseMetadataDTO databaseMetadataDTO = new DatabaseMetadataDTO();
-        databaseMetadataDTO.setTotalReviews(totalReviews);
-        return databaseMetadataDTO;
+        return DatabaseMetadataDTO.builder()
+                .totalReviews(reviewRepository.getTotalNumberOfReviews())
+                .build();
     }
 
-    @Override
-    public Review getReviewById(int id) {
-        Review review = forumDAO.findReviewById(id);
-        return review;
+    public Review getReviewById(Long reviewId) {
+        Optional<Review> review = reviewRepository.getReviewWithoutTeacherById(reviewId);
+        review.ifPresentOrElse(
+                r -> r.setTeacher(reviewRepository.getReviewRecipient(reviewId)),
+                () -> {
+                    throw new ReviewNotFoundException(reviewId);
+                });
+        return review.get();
     }
-
-    @Override
+    
     public DatabaseMetadataDTO getTotalTeachers() {
-        int totalTeachers = forumDAO.getNumberOfTeachers();
-        DatabaseMetadataDTO databaseMetadataDTO = new DatabaseMetadataDTO();
-        databaseMetadataDTO.setTotalTeachers(totalTeachers);
-        return databaseMetadataDTO;
+        return DatabaseMetadataDTO.builder()
+                .totalTeachers(teacherRepository.getTotalNumberOfTeachers())
+                .build();
     }
 
-    @Override
-    public Teacher fetchLimitedTeacherReviewsById(int teacherId, int limit) {
-        if(limit == -1) {
-            Teacher teacher = forumDAO.fetchTeacherByIdWithReviews(teacherId);
-            return teacher;
+    public TeacherWithReviewsDTO getTeacherWithAllReviewsById(Long teacherId){
+        return teacherRepository.getTeacherInfo(teacherId)
+                .map(t -> {
+                    return TeacherWithReviewsDTO.builder()
+                            .id(t.getId())
+                            .category(t.getCategory())
+                            .academicTitle(t.getAcademicTitle())
+                            .fullName(t.getFullName())
+                            .average(t.getAverage())
+                            .reviews(reviewRepository.getTeacherReviews(t.getId()))
+                            .build();
+                })
+                .orElseThrow(() -> new TeacherNotFoundException(teacherId));
+    }
+
+    public TeacherWithReviewsDTO getTeacherWithLimitedReviewsById(Long teacherId, Long limit){
+        return limit == - 1
+                ? getTeacherWithAllReviewsById(teacherId)
+                : teacherRepository.getTeacherInfo(teacherId)
+                    .map(t -> {
+                        return TeacherWithReviewsDTO.builder()
+                                .id(t.getId())
+                                .category(t.getCategory())
+                                .academicTitle(t.getAcademicTitle())
+                                .fullName(t.getFullName())
+                                .average(t.getAverage())
+                                .reviews(reviewRepository.getTeacherReviewsLimited(teacherId, limit))
+                                .build();
+                    })
+                    .orElseThrow(() -> new TeacherNotFoundException(teacherId));
+    }
+
+    public TeacherWithReviewsDTO getTeacherWithLimitedReviewsByFullName(String firstName, String lastName, Long limit){
+        Long teacherId = getTeacherIdByFullName(firstName, lastName);
+        return getTeacherWithLimitedReviewsById(teacherId, limit);
+    }
+
+    private Long getTeacherIdByFullName(String firstName, String lastName){
+        Optional<Long> teacherId = teacherRepository.getTeacherIdByFullName("%" + firstName + "%", "%" + lastName + "%");
+        if(teacherId.isEmpty()){
+            throw new TeacherNotFoundByFullNameException(firstName, lastName);
         }
-        Teacher teacher = forumDAO.fetchTeacherByIdWithLimitedReviews(teacherId, limit);
-        return teacher;
+        return teacherId.get();
     }
 
-    @Override
-    public Teacher fetchLimitedTeacherReviewsByFullName(String firstName, String lastName, int limit) {
-        if(limit == -1){
-            Teacher teacher = forumDAO.fetchTeacherByFullNameWithReviews(firstName, lastName);
-            return teacher;
+    public Set<TeacherInfoDTO> getTeachersInfoByCategory(String category){
+        checkIfCategoryExists(category);
+        return teacherRepository.getTeachersInfoByCategory(category);
+    }
+
+    public Set<TeacherInfoDTO> getBestTeachersOfCategory(String category){
+        checkIfCategoryExists(category);
+        return teacherRepository.getBestTeachersOfCategory(category);
+    }
+
+    private void checkIfCategoryExists(String category){
+        if(!categories.contains(category.toUpperCase())){
+            throw new CategoryMembersNotFoundException(category);
         }
-        Teacher teacher = forumDAO.fetchTeacherByFullNameWithLimitedReviews(firstName, lastName, limit);
-        return teacher;
     }
 
-    @Override
-    public List<Teacher> getTeachersByCategory(String category)  {
-        return forumDAO.getTeachersByCategory(category);
+    public Set<TeacherWithReviewsDTO> getLimitedBestTeachersOfCategoryWithExampleReviews(String category, int limit){
+        checkIfCategoryExists(category);
+        return getBestTeachersInfoByCategoryLimited(category, limit).stream()
+                    .map(teacherInfo -> TeacherWithReviewsDTO.builder()
+                            .id(teacherInfo.getId())
+                            .category(teacherInfo.getCategory())
+                            .academicTitle(teacherInfo.getAcademicTitle())
+                            .fullName(teacherInfo.getFullName())
+                            .average(teacherInfo.getAverage())
+                            .reviews(reviewRepository.getTeacherReviewsLimited(teacherInfo.getId(),
+                                    WORST_AND_BEST_TEACHERS_REVIEW_LIMIT))
+                            .build()
+                    )
+                    .collect(Collectors.toSet());
     }
 
-    @Override
-    public List<Teacher> getBestTeachersRankedByCategory(String category) {
-        return forumDAO.getTeachersRankedByCategory(category, false);
+    private Set<TeacherInfoDTO> getBestTeachersInfoByCategoryLimited(String category, int limit){
+        return teacherRepository.getBestTeachersOfCategoryLimited(category, limit);
     }
 
-    @Override
-    public List<Teacher> getWorstTeachersRankedByCategory(String category) {
-        List<Teacher> teachers = forumDAO.getTeachersRankedByCategory(category, false);
-        return teachers;
+    public Set<TeacherWithReviewsDTO> getLimitedWorstTeachersOfCategoryWithExampleReviews(String category, int limit){
+        checkIfCategoryExists(category);
+        return getWorstTeachersInfoByCategoryLimited(category, limit).stream()
+                .map(teacherInfo -> TeacherWithReviewsDTO.builder()
+                        .id(teacherInfo.getId())
+                        .category(teacherInfo.getCategory())
+                        .academicTitle(teacherInfo.getAcademicTitle())
+                        .fullName(teacherInfo.getFullName())
+                        .average(teacherInfo.getAverage())
+                        .reviews(reviewRepository.getTeacherReviewsLimited(teacherInfo.getId(),
+                                WORST_AND_BEST_TEACHERS_REVIEW_LIMIT))
+                        .build()
+                )
+                .collect(Collectors.toSet());
     }
 
-    @Override
-    public List<Teacher> getBestRankedTeachersByCategoryLimited(String category, int limit) {
-        return forumDAO.fetchWorstOrBestTeachersByCategoryWithReviewsLimited(category, limit, 3, true);
-    }
-
-    @Override
-    public List<Teacher> getWorstRankedTeachersByCategoryLimited(String category, int limit) {
-        return forumDAO.fetchWorstOrBestTeachersByCategoryWithReviewsLimited(category, limit, 3, false);
+    private Set<TeacherInfoDTO> getWorstTeachersInfoByCategoryLimited(String category, int limit){
+        return teacherRepository.getWorstTeachersOfCategoryLimited(category, limit);
     }
 }
