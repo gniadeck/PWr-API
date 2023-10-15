@@ -38,6 +38,7 @@ public class NewsServiceCachingTest {
 
         verify(newsDAO, times(1))
                 .getFacultyNews(FacultyType.INFORMATYKI_I_TELEKOMUNIKACJI);
+
     }
 
 }

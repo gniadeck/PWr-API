@@ -36,7 +36,7 @@ public class ParkingProxy {
         return parkingState;
     }
 
-    public List<ParkingWithHistory> getParkingWithHistory() throws IOException {
+    public List<ParkingWithHistory> getParkingWithHistory() {
         if(parkingStateWithHistoryQualifiesForUpdate(parkingWithHistoryState)){
             parkingWithHistoryState = getRawParkingInfo();
 

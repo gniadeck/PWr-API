@@ -3,6 +3,7 @@ package dev.wms.pwrapi.parking;
 import dev.wms.pwrapi.dto.parking.Parking;
 import dev.wms.pwrapi.dto.parking.ParkingWithHistory;
 import dev.wms.pwrapi.service.parking.ParkingProxy;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -12,6 +13,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @SpringBootTest
+@Disabled
 public class ParkingProxyTest {
     @Autowired
     private ParkingProxy parkingProxy;

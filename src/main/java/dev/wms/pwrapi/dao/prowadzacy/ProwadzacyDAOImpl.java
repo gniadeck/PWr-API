@@ -73,9 +73,7 @@ public class ProwadzacyDAOImpl implements ProwadzacyDAO {
 
         Document page;
         try(Response response = client.newCall(request).execute()) {
-
             page = Jsoup.parse(response.body().string());
-
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -103,9 +101,7 @@ public class ProwadzacyDAOImpl implements ProwadzacyDAO {
             }
         }
 
-        if(page.getElementById("wyniki").text().contains("Podana fraza nie została odnaleziona")){
-            throw new EmptyResultsException();
-        }
+        assertResultNotEmpty(page);
 
         List<Element> days = page.getElementsByClass("day");
         List<Element> daysHeaders = page.getElementsByAttributeValue("id","days").first().getElementsByTag("div");
@@ -113,17 +109,12 @@ public class ProwadzacyDAOImpl implements ProwadzacyDAO {
 
         List<ProwadzacyDay> processedDays = new ArrayList<>(Collections.nCopies(8, new ProwadzacyDay()));
 
-
         int dayIndex = 0;
 
-        Optional<Element> titleOptional = Optional.ofNullable(page.getElementsByTag("left").first());
-        String title = null;
-        if(titleOptional.isPresent()){
-            title = titleOptional.get().text();
-            if(title.equals("")){
-                throw new EmptyResultsException();
-            }
-        }
+        String title = Optional.ofNullable(page.getElementsByTag("left").first())
+                .map(Element::text)
+                .filter(text -> text.equals(""))
+                .orElseThrow(EmptyResultsException::new);
 
 
         for(Element day : days){
@@ -173,7 +164,8 @@ public class ProwadzacyDAOImpl implements ProwadzacyDAO {
         }
 
         int index = 0;
-        ProwadzacyResult result = ProwadzacyResult.builder()
+
+        return ProwadzacyResult.builder()
                 .title(title)
                 .pn(processedDays.get(index++))
                 .wt(processedDays.get(index++))
@@ -185,8 +177,12 @@ public class ProwadzacyDAOImpl implements ProwadzacyDAO {
                 .icalLink(icalLink)
                 .build();
 
-        return result;
+    }
 
+    private void assertResultNotEmpty(Document page) {
+        if(page.getElementById("wyniki").text().contains("Podana fraza nie została odnaleziona")){
+            throw new EmptyResultsException();
+        }
     }
 
 }

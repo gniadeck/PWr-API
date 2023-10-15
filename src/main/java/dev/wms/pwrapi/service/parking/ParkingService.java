@@ -9,7 +9,7 @@ import java.util.List;
 
 public interface ParkingService {
 
-    List<Parking> getParkingData() throws JsonProcessingException, IOException;
+    List<Parking> getParkingData() throws IOException;
 
     List<ParkingWithHistory> getRawParkingData() throws IOException;
 }

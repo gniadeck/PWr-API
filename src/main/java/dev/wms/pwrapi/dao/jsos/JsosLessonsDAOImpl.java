@@ -9,13 +9,14 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-import dev.wms.pwrapi.utils.http.HttpUtils;
-import dev.wms.pwrapi.utils.jsos.JsosHttpUtils;
+import dev.wms.pwrapi.dao.auth.AuthDao;
+import dev.wms.pwrapi.utils.http.HttpClient;
+import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.jsoup.nodes.*;
 import org.springframework.stereotype.Repository;
 
-import dev.wms.pwrapi.scrapper.jsos.JsosScrapperServices;
+import dev.wms.pwrapi.scrapper.jsos.JsosScrapperService;
 import dev.wms.pwrapi.entity.jsos.JsosLesson;
 import dev.wms.pwrapi.entity.jsos.weeks.JsosDay;
 import dev.wms.pwrapi.entity.jsos.weeks.JsosDaySubject;
@@ -28,16 +29,18 @@ import okhttp3.Request;
 import okhttp3.Response;
 
 @Repository
+@RequiredArgsConstructor
 public class JsosLessonsDAOImpl implements JsosLessonsDAO {
 
+    private final AuthDao jsosAuthDao;
+    private final JsosScrapperService jsosScrapperService;
 
     @Override
-    public JsosDay getTodaysLessons(String login, String password) throws IOException, LoginException, NoTodayClassException{
+    public JsosDay getTodaysLessons(String login, String password) throws LoginException, NoTodayClassException{
 
-        OkHttpClient client = JsosHttpUtils.getLoggedClient(login, password);
+        HttpClient client = jsosAuthDao.login(login, password);
 
-        Document page = HttpUtils.makeRequestWithClientAndGetDocument(client,
-                "https://jsos.pwr.edu.pl/index.php/student/zajecia/tydzien");
+        Document page = client.getDocument("https://jsos.pwr.edu.pl/index.php/student/zajecia/tydzien");
 
         if(page.getElementsByClass("rozkladyZajecDzien rozkladyDzisiaj").size() == 0){
             throw new NoTodayClassException();
@@ -62,13 +65,12 @@ public class JsosLessonsDAOImpl implements JsosLessonsDAO {
     }
 
     @Override
-    public JsosDay getTomorrowLessons(String login, String password) throws IOException, LoginException{
+    public JsosDay getTomorrowLessons(String login, String password) throws LoginException{
 
-        OkHttpClient client = JsosHttpUtils.getLoggedClient(login, password);
+        HttpClient client = jsosAuthDao.login(login, password);
 
 
-        Document page = HttpUtils.makeRequestWithClientAndGetDocument(client,
-                "https://jsos.pwr.edu.pl/index.php/student/zajecia/tydzien");
+        Document page = client.getDocument("https://jsos.pwr.edu.pl/index.php/student/zajecia/tydzien");
 
         String todayNameDayShortcut;
         Element todayRow;
@@ -88,7 +90,8 @@ public class JsosLessonsDAOImpl implements JsosLessonsDAO {
 
         //determine element num from day
         List<String> dayNames = new ArrayList<String>(Arrays.asList("pn", "wt", "śr", "cz", "pt", "so", "n"));
-        Map<String, String> dayNamesMap = Map.of("pn", "Poniedziałek", "wt", "Wtorek", "śr", "Środa", "cz", "Czwartek", "pt", "Piątek", "so", "Sobota", "n", "Niedziela");
+        Map<String, String> dayNamesMap = Map.of("pn", "Poniedziałek", "wt", "Wtorek", "śr",
+                "Środa", "cz", "Czwartek", "pt", "Piątek", "so", "Sobota", "n", "Niedziela");
 
         //check if its sunday
         int dayIndex = dayNames.indexOf(todayNameDayShortcut);
@@ -148,33 +151,32 @@ public class JsosLessonsDAOImpl implements JsosLessonsDAO {
 
     @Override
     public JsosWeek getThisWeekLessons(String login, String password) throws IOException, LoginException{
-        return JsosScrapperServices.getOffsetWeekLessons(login, password, 0);
+        return jsosScrapperService.getOffsetWeekLessons(login, password, 0);
     }
 
     @Override
     public JsosWeek getNextWeekLessons(String login, String password) throws IOException, LoginException{
-        return JsosScrapperServices.getOffsetWeekLessons(login, password, 1);
+        return jsosScrapperService.getOffsetWeekLessons(login, password, 1);
     }
 
     @Override
     public JsosWeek getOffsetWeekLessons(String login, String password, int offset) throws IOException, LoginException{
-        return JsosScrapperServices.getOffsetWeekLessons(login, password, offset);
+        return jsosScrapperService.getOffsetWeekLessons(login, password, offset);
     }
 
 
     @Override
     public List<JsosLesson> getAllLessons(String login, String password) throws IOException, LoginException{
 
-        OkHttpClient client = JsosHttpUtils.getLoggedClient(login, password);
+        HttpClient client = jsosAuthDao.login(login, password);
 
         Request request = new Request.Builder()
             .url("https://jsos.pwr.edu.pl/index.php/student/zajecia")
             .build();
 
-        Response response = client.newCall(request).execute();
+        client.getResponse(request);
 
-        Document page = HttpUtils.makeRequestWithClientAndGetDocument(client,
-                "https://jsos.pwr.edu.pl/index.php/student/zajecia");
+        Document page = client.getDocument("https://jsos.pwr.edu.pl/index.php/student/zajecia");
 
         List<Element> rows = page.getElementsByClass("kliknij");
         

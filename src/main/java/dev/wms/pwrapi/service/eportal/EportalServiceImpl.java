@@ -1,11 +1,10 @@
 package dev.wms.pwrapi.service.eportal;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import dev.wms.pwrapi.dao.eportal.EportalCalendarDAO;
 import dev.wms.pwrapi.dao.eportal.EportalDAO;
+import dev.wms.pwrapi.dto.eportal.sections.EportalSection;
 import dev.wms.pwrapi.entity.eportal.MarkSummary;
 import dev.wms.pwrapi.entity.eportal.calendar.CalendarMonth;
-import dev.wms.pwrapi.dto.eportal.sections.EportalSection;
 import dev.wms.pwrapi.utils.eportal.exceptions.WrongCourseIdException;
 import dev.wms.pwrapi.utils.generalExceptions.LoginException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,23 +27,23 @@ public class EportalServiceImpl implements EportalService {
     }
 
     @Override
-    public String getEportalData(String login, String password) throws JsonProcessingException, IOException, LoginException {
+    public String getEportalData(String login, String password) throws LoginException {
         return generalDAO.login(login, password);
     }
 
     @Override
-    public String getEportalKursy(String login, String password) throws JsonProcessingException, IOException, LoginException {
+    public String getEportalKursy(String login, String password) throws IOException, LoginException {
         return generalDAO.getEportalKursy(login, password);
     }
 
     @Override
-    public List<EportalSection> getEportalSekcje(String login, String password, int id) throws JsonProcessingException, IOException, LoginException, WrongCourseIdException {
+    public List<EportalSection> getEportalSekcje(String login, String password, int id) throws IOException, LoginException, WrongCourseIdException {
         return generalDAO.getEportalSekcje(login, password, id);
     }
 
 
     @Override
-    public List<MarkSummary> getEportalOceny(String login, String password, int id) throws JsonProcessingException {
+    public List<MarkSummary> getEportalOceny(String login, String password, int id) {
         return generalDAO.getEportalOceny(login, password, id);
     }
 

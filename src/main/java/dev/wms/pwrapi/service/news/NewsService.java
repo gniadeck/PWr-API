@@ -15,13 +15,11 @@ public class NewsService {
 
     @Cacheable("pwr-news")
     public Channel fetchGeneralNews() {
-        System.out.println("FETCHING NEW NEWSES");
         return newsDAO.parsePwrRSS("https://pwr.edu.pl/rss/pl/24.xml");
     }
 
     @Cacheable("pwr-news")
     public Channel fetchNewsForFaculty(FacultyType faculty) {
-        System.out.println("FETCHING NEW NEWSES");
         return newsDAO.getFacultyNews(faculty);
     }
 }

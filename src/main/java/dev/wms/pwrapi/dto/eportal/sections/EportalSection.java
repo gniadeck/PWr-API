@@ -1,11 +1,11 @@
 package dev.wms.pwrapi.dto.eportal.sections;
 
-import java.util.ArrayList;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.util.List;
 
 @Data
 @Builder
@@ -14,6 +14,6 @@ import lombok.NoArgsConstructor;
 public class EportalSection {
 
     private String sectionName;
-    private ArrayList<EportalSectionElement> elements;
+    private List<EportalSectionElement> elements;
     
 }

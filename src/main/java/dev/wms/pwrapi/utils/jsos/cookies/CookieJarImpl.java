@@ -27,7 +27,6 @@ public class CookieJarImpl implements CookieJar{
                 
 
                 if(cookieStore.get(url.host()) != null && cookies != null){
-                    System.out.println("Trying to add cookies " + cookies);
                     for(Cookie c : cookies){
                         
                         //look for duplicates
@@ -36,18 +35,16 @@ public class CookieJarImpl implements CookieJar{
                             if(c.name().equals(k.name())){
                                 cookieStore.get(url.host()).remove(k);
                                 i--;
-                            } 
-                            System.out.println("Removed duplicate cookie " + c.name());
+                            }
                         }
 
                          cookieStore.get(url.host()).add(c);
 
                     }
                 } else {
-                    cookieStore.put(url.host(), new ArrayList<Cookie>(cookies));
+                    cookieStore.put(url.host(), new ArrayList<>(cookies));
                 }
 
-                System.out.println(cookieStore);
             }
     
             @NotNull

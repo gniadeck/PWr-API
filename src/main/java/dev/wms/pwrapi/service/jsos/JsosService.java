@@ -29,14 +29,13 @@ public interface JsosService {
 
     List<JsosLesson> getAllStudentsLessons(String login, String password) throws IOException, LoginException;
 
-    List<JsosSemester> getStudentMarks(String login, String password)
-            throws JsonProcessingException, IOException, LoginException;
+    List<JsosSemester> getStudentMarks(String login, String password) throws LoginException;
 
-    JsosConnection login(String login, String password) throws LoginException;
+    void login(String login, String password) throws LoginException;
 
     JsosStudentData getStudentData(String login, String password) throws LoginException;
-    FinanceResult getStudentFinanse(String login, String password) throws IOException;
-    FinanceOperationResult getStudentFinanceOperations(String login, String password) throws IOException;
-    List<JsosMessageShort> getStudentMessagesList(String login, String password, int page) throws IOException;
-    List<JsosMessageFull> getStudentMessage(String login, String password, int page, Integer... ids) throws IOException;
+    FinanceResult getStudentFinanse(String login, String password);
+    FinanceOperationResult getStudentFinanceOperations(String login, String password);
+    List<JsosMessageShort> getStudentMessagesList(String login, String password, int page);
+    List<JsosMessageFull> getStudentMessage(String login, String password, int page, Integer... ids);
 }

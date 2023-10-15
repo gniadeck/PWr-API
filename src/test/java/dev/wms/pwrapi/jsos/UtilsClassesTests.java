@@ -1,13 +1,15 @@
 package dev.wms.pwrapi.jsos;
 
+import dev.wms.pwrapi.dao.auth.AuthDao;
 import dev.wms.pwrapi.testingUtils.TestUtils;
 import dev.wms.pwrapi.utils.generalExceptions.LoginException;
-import dev.wms.pwrapi.utils.jsos.JsosHttpUtils;
+import dev.wms.pwrapi.utils.http.HttpClient;
 import dev.wms.pwrapi.utils.jsos.JsosLessonsUtils;
 import okhttp3.OkHttpClient;
 import org.jsoup.nodes.Document;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Arrays;
 import java.util.List;
@@ -15,6 +17,9 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class UtilsClassesTests {
+
+    @Autowired
+    AuthDao jsosAuthDao;
 
     @Test
     public void jsosLessonsUtilsNameFromClassMethodTest(){
@@ -56,7 +61,7 @@ public class UtilsClassesTests {
 
         assertThrows(RuntimeException.class, () ->
                 JsosLessonsUtils.getUrlOfNextWeek(new Document(""),
-                        new OkHttpClient(),
+                        new HttpClient(),
                         -1));
 
     }
@@ -66,7 +71,7 @@ public class UtilsClassesTests {
     public void loginUtilThrowsExceptionOnWrongLoginAndPassword(){
 
         assertThrows(LoginException.class, () ->
-                JsosHttpUtils.getLoggedClient("omgImSuchABadLogin", "omgImSuchABadPassword"));
+                jsosAuthDao.login("omgImSuchABadLogin", "omgImSuchABadPassword"));
 
     }
 

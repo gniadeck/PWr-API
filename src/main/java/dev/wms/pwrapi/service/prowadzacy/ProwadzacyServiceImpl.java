@@ -2,18 +2,15 @@ package dev.wms.pwrapi.service.prowadzacy;
 
 import dev.wms.pwrapi.dao.prowadzacy.ProwadzacyDAO;
 import dev.wms.pwrapi.entity.prowadzacy.ProwadzacyResult;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
+@RequiredArgsConstructor
 public class ProwadzacyServiceImpl implements ProwadzacyService {
 
-    private ProwadzacyDAO prowadzacyDAO;
-
-    @Autowired
-    public ProwadzacyServiceImpl(ProwadzacyDAO prowadzacyDAO){
-        this.prowadzacyDAO = prowadzacyDAO;
-    }
+    private final ProwadzacyDAO prowadzacyDAO;
 
     @Override
     public String getWebsiteStatus(){

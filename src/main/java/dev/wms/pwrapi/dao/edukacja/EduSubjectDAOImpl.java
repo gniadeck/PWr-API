@@ -2,7 +2,7 @@ package dev.wms.pwrapi.dao.edukacja;
 
 import dev.wms.pwrapi.entity.edukacja.Group;
 import dev.wms.pwrapi.entity.edukacja.Subject;
-import dev.wms.pwrapi.scrapper.edukacja.EduScrapperServices;
+import dev.wms.pwrapi.scrapper.edukacja.EdukacjaScrapperService;
 import dev.wms.pwrapi.utils.edukacja.exceptions.EnrollmentAccessDeniedException;
 import dev.wms.pwrapi.utils.generalExceptions.LoginException;
 import okhttp3.*;
@@ -21,16 +21,18 @@ import java.util.List;
 public class EduSubjectDAOImpl implements EduSubjectDAO {
 
     private WebDriver driver;
-    private OkHttpClient client;
+    private final OkHttpClient client;
+    private final EdukacjaScrapperService scrapperServices;
 
-    public EduSubjectDAOImpl(){
+    public EduSubjectDAOImpl(EdukacjaScrapperService scrapperServices){
+        this.scrapperServices = scrapperServices;
         client = new OkHttpClient();
     }
 
 
     @Override
-    public ArrayList<Subject> doFetchSubjects(String login, String password) {
-        driver = EduScrapperServices.login(login, password);
+    public List<Subject> doFetchSubjects(String login, String password) {
+        driver = scrapperServices.login(login, password);
 
         // try to log into edukacja with given credential, if login fails throw login exceptio
         try {
@@ -74,11 +76,8 @@ public class EduSubjectDAOImpl implements EduSubjectDAO {
 
         // fetch data from first row of table
         // get number of pages
-        System.out.println(driver.findElements(new ByChained(By.cssSelector("input.paging-numeric-btn-disabled"),
-                By.cssSelector("input.paging-numeric-btn"))).isEmpty());
-        ArrayList<WebElement> pagination = new ArrayList<>(driver.findElements(By.className("paging-numeric-btn")));
-        System.out.println(pagination.size());
-        ArrayList<Subject> subjects = new ArrayList<Subject>();
+        List<WebElement> pagination = new ArrayList<>(driver.findElements(By.className("paging-numeric-btn")));
+        List<Subject> subjects = new ArrayList<>();
         int i = 2;
         int j = 0;
         while (true) {
@@ -112,13 +111,6 @@ public class EduSubjectDAOImpl implements EduSubjectDAO {
             }
 
         }
-
-        System.out.println(subjects);
-
-        // fetch groups
-        // fetch group pagination
-        ArrayList<WebElement> groupPagination = new ArrayList<WebElement>(driver.findElements(By.xpath(
-                "/html/body/table/tbody/tr/td/table/tbody/tr[4]/td/table/tbody/tr[1]/td[3]/table/tbody/tr/td/table[7]/tbody/tr[34]/td/table/tbody/tr/td/span/input[2]")));
 
         for (i = 0; i < subjects.size(); i++) {
 
@@ -182,12 +174,6 @@ public class EduSubjectDAOImpl implements EduSubjectDAO {
 
             }
 
-        }
-
-        for (Subject s : subjects) {
-            System.out.println("Subjects for " + s.getId() + ": ");
-            for (Group g : s.getGroups())
-                System.out.println(g);
         }
 
         return subjects;
