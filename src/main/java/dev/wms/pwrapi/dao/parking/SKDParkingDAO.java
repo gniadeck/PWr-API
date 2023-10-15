@@ -8,7 +8,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import dev.wms.pwrapi.dto.parking.ParkingWithHistory;
-import dev.wms.pwrapi.utils.http.HttpUtils;
+import dev.wms.pwrapi.utils.http.HttpClient;
 import dev.wms.pwrapi.utils.parking.ParkingDateUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jsoup.nodes.Document;
@@ -37,10 +37,8 @@ public class SKDParkingDAO implements ParkingDAO {
         return parseWithDetails(fetchParkingWebsite());
     }
 
-    private Document fetchParkingWebsite() throws IOException {
-        OkHttpClient client = new OkHttpClient().newBuilder()
-                .build();
-        return HttpUtils.makeRequestWithClientAndGetDocument(client, "https://skd.pwr.edu.pl/");
+    private Document fetchParkingWebsite() {
+        return new HttpClient().getDocument("https://skd.pwr.edu.pl/");
     }
 
     private List<Parking> parseProcessed(Element page){

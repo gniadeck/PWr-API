@@ -4,7 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import dev.wms.pwrapi.dto.news.*;
-import dev.wms.pwrapi.utils.http.HttpUtils;
+import dev.wms.pwrapi.utils.http.HttpClient;
 import okhttp3.OkHttpClient;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -26,8 +26,7 @@ public class NewsDAO {
     private final Pattern datePattern = Pattern.compile("\\d{2} [a-zA-Z]{3} \\d{4}");
 
     public Channel parsePwrRSS(String rssUrl) {
-        OkHttpClient client = new OkHttpClient();
-        String response = HttpUtils.makeRequestWithClientAndGetString(client, rssUrl);
+        String response = new HttpClient().getString(rssUrl);
         XmlMapper xmlMapper = new XmlMapper();
         xmlMapper.configure(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY, true);
         xmlMapper.configure(DeserializationFeature.ACCEPT_EMPTY_ARRAY_AS_NULL_OBJECT, true);
@@ -35,7 +34,7 @@ public class NewsDAO {
         xmlMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
         try {
-            Rss items = xmlMapper.readValue(response, Rss.class);
+            NewsRss items = xmlMapper.readValue(response, NewsRss.class);
             for(Item item : items.getChannel().getItem()) reformatDate(item);
 
             return items.getChannel();
@@ -46,9 +45,10 @@ public class NewsDAO {
 
     private void reformatDate(Item item){
         Matcher matcher = datePattern.matcher(item.getPubDate());
-        matcher.find();
-        LocalDate parsedDate = LocalDate.parse(matcher.group(), rssFormatter);
-        item.setPubDate(parsedDate.format(goalFormatter));
+        if(matcher.find()) {
+            LocalDate parsedDate = LocalDate.parse(matcher.group(), rssFormatter);
+            item.setPubDate(parsedDate.format(goalFormatter));
+        }
     }
 
     public Channel getFacultyNews(FacultyType faculty) {
@@ -61,7 +61,7 @@ public class NewsDAO {
 
     private Channel parsePwrHTML(String url) {
         OkHttpClient client = new OkHttpClient();
-        Document document = HttpUtils.makeRequestWithClientAndGetDocument(client, url);
+        Document document = new HttpClient(client).getDocument(url);
 
         Elements newsBoxes = document.getElementsByClass("news-box");
         newsBoxes.removeIf(box -> box.text().isEmpty());

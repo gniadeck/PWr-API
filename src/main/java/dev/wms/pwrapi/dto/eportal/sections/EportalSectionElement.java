@@ -10,12 +10,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class EportalSectionElement {
-
-
-
     private String title;
     private String type;
-
-
-    
 }

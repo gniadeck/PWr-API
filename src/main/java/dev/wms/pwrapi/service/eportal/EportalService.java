@@ -11,13 +11,13 @@ import java.io.IOException;
 import java.util.List;
 
 public interface EportalService {
-    String getEportalData(String login, String password) throws JsonProcessingException, IOException, LoginException;
+    String getEportalData(String login, String password) throws LoginException;
 
-    String getEportalKursy(String login, String password) throws JsonProcessingException, IOException, LoginException;
+    String getEportalKursy(String login, String password) throws IOException, LoginException;
 
-    List<EportalSection> getEportalSekcje(String login, String password, int id) throws JsonProcessingException, IOException, LoginException, WrongCourseIdException;
+    List<EportalSection> getEportalSekcje(String login, String password, int id) throws IOException, LoginException, WrongCourseIdException;
 
-    List<MarkSummary> getEportalOceny(String login, String password, int id) throws JsonProcessingException;
+    List<MarkSummary> getEportalOceny(String login, String password, int id);
 
     CalendarMonth getEportalKalendarzOffset(String login, String password, int offset) throws IOException;
 

@@ -24,12 +24,31 @@ public class CachingConfig implements CacheManagerCustomizer<ConcurrentMapCacheM
 
     @Override
     public void customize(ConcurrentMapCacheManager cacheManager) {
-        cacheManager.setCacheNames(List.of("pwr-news"));
+        cacheManager.setCacheNames(List.of("pwr-news", "pwr-events", "forum-metadata", "reviews", "teachers", "usos-login"));
     }
 
     @CacheEvict(allEntries = true, cacheNames = "pwr-news")
-    @Scheduled(fixedDelayString = "${pwr-api.news.cacheTTL}")
+    @Scheduled(fixedDelayString = "${pwr-api.cacheTTL.news}")
     public void reportCacheEvict(){
+        log.info("evicting pwr-news from cache");
+
     }
 
+    @CacheEvict(allEntries = true, cacheNames = "pwr-events")
+    @Scheduled(fixedDelayString = "${pwr-api.cacheTTL.events}")
+    public void reportCacheEventEvict(){
+        log.debug("evicting pwr-events from cache");
+    }
+
+    @CacheEvict(allEntries = true, cacheNames = "usos-login")
+    @Scheduled(fixedDelayString = "${usos-login.cacheTTL}")
+    public void reportUsosLoginEvict(){
+    }
+
+    @CacheEvict(allEntries = true, cacheNames = {"forum-metadata", "reviews", "teachers"})
+    @Scheduled(fixedDelayString = "${forum.cacheTTL}")
+    public void evictForumData(){
+        log.debug("evicting forum metadata from cache");
+    }
+    
 }

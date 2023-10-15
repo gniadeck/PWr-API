@@ -1,99 +1,114 @@
 package dev.wms.pwrapi.service.forum;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import dev.wms.pwrapi.dao.forum.ForumDAO;
-import dev.wms.pwrapi.dao.forum.ForumDAOImpl;
-import dev.wms.pwrapi.entity.forum.Review;
-import dev.wms.pwrapi.entity.forum.Teacher;
+import dev.wms.pwrapi.dao.forum.DatabaseMetadataRepository;
+import dev.wms.pwrapi.dao.forum.ReviewRepository;
+import dev.wms.pwrapi.dao.forum.TeacherRepository;
+import dev.wms.pwrapi.entity.forum.*;
+
+import dev.wms.pwrapi.utils.forum.consts.Category;
 import dev.wms.pwrapi.utils.forum.dto.DatabaseMetadataDTO;
-import org.springframework.beans.factory.annotation.Autowired;
+import dev.wms.pwrapi.utils.forum.dto.ReviewWithTeacherDTO;
+import dev.wms.pwrapi.utils.forum.dto.TeacherInfoDTO;
+import dev.wms.pwrapi.utils.forum.dto.TeacherWithReviewsDTO;
+import dev.wms.pwrapi.utils.forum.exceptions.ReviewNotFoundException;
+import dev.wms.pwrapi.utils.forum.exceptions.TeacherNotFoundException;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+
 import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
-public class ForumServiceImpl implements ForumService {
+@RequiredArgsConstructor
+public class ForumServiceImpl {
+    private final DatabaseMetadataRepository databaseMetadataRepository;
+    private final ReviewRepository reviewRepository;
+    private final TeacherRepository teacherRepository;
+    private final int TEACHER_RANKING_SAMPLE_REVIEWS_LIMIT = 3;
 
-    private final ForumDAO forumDAO;
-
-    @Autowired
-    public ForumServiceImpl(ForumDAOImpl forumDAOImpl){
-        this.forumDAO = forumDAOImpl;
-    }
-
-    @Override
     public DatabaseMetadataDTO getDatabaseMetadata() {
-        int totalTeachers = forumDAO.getNumberOfTeachers();
-        int totalReviews = forumDAO.getNumberOfReviews();
-        String latestRefreshDate = forumDAO.getLastRefreshDate();
-        DatabaseMetadataDTO databaseMetadataDTO = new DatabaseMetadataDTO(totalTeachers, totalReviews, latestRefreshDate);
-        return databaseMetadataDTO;
+        return databaseMetadataRepository.getDatabaseMetadata();
     }
 
-    @Override
     public DatabaseMetadataDTO getTotalReviews() {
-        int totalReviews = forumDAO.getNumberOfReviews();
-        DatabaseMetadataDTO databaseMetadataDTO = new DatabaseMetadataDTO();
-        databaseMetadataDTO.setTotalReviews(totalReviews);
-        return databaseMetadataDTO;
+        return DatabaseMetadataDTO.ofReviewCount(reviewRepository.count());
     }
 
-    @Override
-    public Review getReviewById(int id) {
-        Review review = forumDAO.findReviewById(id);
-        return review;
-    }
-
-    @Override
     public DatabaseMetadataDTO getTotalTeachers() {
-        int totalTeachers = forumDAO.getNumberOfTeachers();
-        DatabaseMetadataDTO databaseMetadataDTO = new DatabaseMetadataDTO();
-        databaseMetadataDTO.setTotalTeachers(totalTeachers);
-        return databaseMetadataDTO;
+        return DatabaseMetadataDTO.ofTeacherCount(teacherRepository.count());
     }
 
-    @Override
-    public Teacher fetchLimitedTeacherReviewsById(int teacherId, int limit) {
-        if(limit == -1) {
-            Teacher teacher = forumDAO.fetchTeacherByIdWithReviews(teacherId);
-            return teacher;
-        }
-        Teacher teacher = forumDAO.fetchTeacherByIdWithLimitedReviews(teacherId, limit);
-        return teacher;
+    public ReviewWithTeacherDTO getReviewById(Long reviewId) {
+        return reviewRepository.findById(reviewId)
+                .map(review -> ReviewWithTeacherDTO.of(review,
+                        teacherRepository.findById(review.getTeacherId()).get()
+                ))
+                .orElseThrow(() -> new ReviewNotFoundException(reviewId));
     }
 
-    @Override
-    public Teacher fetchLimitedTeacherReviewsByFullName(String firstName, String lastName, int limit) {
-        if(limit == -1){
-            Teacher teacher = forumDAO.fetchTeacherByFullNameWithReviews(firstName, lastName);
-            return teacher;
-        }
-        Teacher teacher = forumDAO.fetchTeacherByFullNameWithLimitedReviews(firstName, lastName, limit);
-        return teacher;
+    public TeacherWithReviewsDTO getTeacherWithAllReviewsById(Long teacherId) {
+        return teacherRepository.findById(teacherId)
+                .map(teacher -> mapToTeacherWithReviews(teacher, Pageable.unpaged()))
+                .orElseThrow(() -> new TeacherNotFoundException(teacherId));
     }
 
-    @Override
-    public List<Teacher> getTeachersByCategory(String category)  {
-        return forumDAO.getTeachersByCategory(category);
+    public TeacherWithReviewsDTO getTeacherWithLimitedReviewsById(Long teacherId, int limit) {
+        return limit == -1
+                ? getTeacherWithAllReviewsById(teacherId)
+                : teacherRepository.findById(teacherId)
+                .map(teacher -> mapToTeacherWithReviews(teacher, Pageable.ofSize(limit)))
+                .orElseThrow(() -> new TeacherNotFoundException(teacherId));
     }
 
-    @Override
-    public List<Teacher> getBestTeachersRankedByCategory(String category) {
-        return forumDAO.getTeachersRankedByCategory(category, false);
+    public TeacherWithReviewsDTO getTeacherWithLimitedReviewsByFullName(String firstName, String lastName, String query,
+                                                                        int limit) {
+        Optional<Teacher> teacherOptional = query != null ? teacherRepository.findTeacherByFullNameLikeIgnoreCase(query.trim()) :
+                teacherRepository.findTeacherByFullNameLikeIgnoreCaseOrFullNameLikeIgnoreCase(firstName + " " + lastName,
+                        lastName + " " + firstName);
+        return teacherOptional
+                .map(teacher -> mapToTeacherWithReviews(teacher, Pageable.ofSize(limit)))
+                .orElse(new TeacherWithReviewsDTO());
     }
 
-    @Override
-    public List<Teacher> getWorstTeachersRankedByCategory(String category) {
-        List<Teacher> teachers = forumDAO.getTeachersRankedByCategory(category, false);
-        return teachers;
+    public Optional<Teacher> findFirstByFullNameContaining(String query) {
+        return teacherRepository.findByFullNameContainingIgnoreCase(query)
+                .filter(result -> !result.isEmpty())
+                .map(result -> result.get(0));
     }
 
-    @Override
-    public List<Teacher> getBestRankedTeachersByCategoryLimited(String category, int limit) {
-        return forumDAO.fetchWorstOrBestTeachersByCategoryWithReviewsLimited(category, limit, 3, true);
+    public Set<TeacherInfoDTO> getTeachersInfoByCategory(Category category) {
+        return mapToTeacherInfoDTOs(teacherRepository.getTeachersByCategory(category));
     }
 
-    @Override
-    public List<Teacher> getWorstRankedTeachersByCategoryLimited(String category, int limit) {
-        return forumDAO.fetchWorstOrBestTeachersByCategoryWithReviewsLimited(category, limit, 3, false);
+    public Set<TeacherInfoDTO> getBestTeachersOfCategory(Category category) {
+        return mapToTeacherInfoDTOs(teacherRepository.getTeachersByCategoryOrderByAverageRatingDesc(category));
+    }
+
+    private Set<TeacherInfoDTO> mapToTeacherInfoDTOs(List<Teacher> teachers) {
+        return teachers
+                .stream()
+                .map(TeacherInfoDTO::fromTeacher)
+                .collect(Collectors.toSet());
+    }
+
+    public Set<TeacherWithReviewsDTO> getBestTeachersInfoByCategoryLimitedWithExampleReviews(Category category, int limit) {
+        return teacherRepository.getTeachersByCategoryOrderByAverageRatingDesc(category, Pageable.ofSize(limit))
+                .stream()
+                .map(teacher -> mapToTeacherWithReviews(teacher, Pageable.ofSize(TEACHER_RANKING_SAMPLE_REVIEWS_LIMIT)))
+                .collect(Collectors.toSet());
+    }
+
+    public Set<TeacherWithReviewsDTO> getWorstTeachersInfoByCategoryLimitedWithExampleReviews(Category category, int limit) {
+        return teacherRepository.getTeachersByCategoryOrderByAverageRatingAsc(category, Pageable.ofSize(limit))
+                .stream()
+                .map(teacher -> mapToTeacherWithReviews(teacher, Pageable.ofSize(TEACHER_RANKING_SAMPLE_REVIEWS_LIMIT)))
+                .collect(Collectors.toSet());
+    }
+
+    private TeacherWithReviewsDTO mapToTeacherWithReviews(Teacher teacher, Pageable pageable) {
+        return TeacherWithReviewsDTO.of(teacher, reviewRepository.getReviewsByTeacherId(teacher.getTeacherId(), pageable));
     }
 }

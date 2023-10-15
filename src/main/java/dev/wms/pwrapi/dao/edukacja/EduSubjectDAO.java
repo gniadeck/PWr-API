@@ -2,9 +2,9 @@ package dev.wms.pwrapi.dao.edukacja;
 
 import dev.wms.pwrapi.entity.edukacja.Subject;
 
-import java.util.ArrayList;
+import java.util.List;
 
 public interface EduSubjectDAO {
 
-    ArrayList<Subject> doFetchSubjects(String login, String password);
+    List<Subject> doFetchSubjects(String login, String password);
 }

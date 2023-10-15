@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 import io.swagger.v3.oas.annotations.Operation;
 
 @RestController
-@RequestMapping(value="/api/parking", produces = "application/json")
+@RequestMapping(value = "/api/parking", produces = "application/json")
 @AllArgsConstructor
 public class ParkingAPI {
 
@@ -26,7 +26,7 @@ public class ParkingAPI {
 
     @GetMapping
     @Operation(summary = "Returns processed data from skd.pwr.edu.pl", description = "You can use it to get data from skd.pwr.edu.pl in simple format")
-    public ResponseEntity<List<Parking>> getProcessedParkingInfo() throws JsonProcessingException, IOException{
+    public ResponseEntity<List<Parking>> getProcessedParkingInfo() throws IOException {
         List<Parking> result = parkingService.getParkingData();
         return ResponseEntity.status(HttpStatus.OK).body(result);
 
@@ -35,9 +35,9 @@ public class ParkingAPI {
     @GetMapping("/raw")
     @Operation(summary = "Returns history data from skd.pwr.edu.pl",
             description = "You can use it to get parking history data from last 24h")
-    public ResponseEntity<List<ParkingWithHistory>> getRawParkingInfo() throws IOException{
+    public ResponseEntity<List<ParkingWithHistory>> getRawParkingInfo() throws IOException {
         return ResponseEntity.status(HttpStatus.OK).body(parkingService.getRawParkingData());
     }
 
-    
+
 }

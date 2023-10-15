@@ -9,10 +9,10 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class courseTitle {
+public class CourseTitle {
 
-    private String wydzial;
-    private String nazwa;
+    private String faculty;
+    private String name;
     private String detailsLink;
     
 }

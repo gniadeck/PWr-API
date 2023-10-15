@@ -20,12 +20,12 @@ public class ParkingServiceImpl implements ParkingService {
     private ParkingProxy parkingProxy;
 
     @Override
-    public List<Parking> getParkingData() throws JsonProcessingException, IOException{
+    public List<Parking> getParkingData() throws IOException{
         return parkingProxy.getParkingState();
     }
 
     @Override
-    public List<ParkingWithHistory> getRawParkingData() throws IOException{
+    public List<ParkingWithHistory> getRawParkingData() {
         return parkingProxy.getParkingWithHistory();
     }
 

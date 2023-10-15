@@ -59,7 +59,7 @@ public class JsosAPI {
     @Operation(summary = "Get lessons for whole week with given offset",
             description = "You can use this endpoint to get all lessons in given week, up to 10 weeks back and forth. " +
                     "For higher limits you need to host the API yourself and change it in code")
-    public ResponseEntity<JsosWeek> getOffsetWeekLessons(String login, String password, @PathVariable @Min(-10) @Max(10) int offset) throws IOException, TooBigOffsetException, LoginException {
+    public ResponseEntity<JsosWeek> getOffsetWeekLessons(String login, String password, @PathVariable @Min(-10) @Max(10) int offset) throws IOException, LoginException {
         return ResponseEntity.status(HttpStatus.OK).body(jsosService.getOffsetLessons(login, password, offset));
     }
 
@@ -102,7 +102,7 @@ public class JsosAPI {
     @GetMapping("/oceny")
     @Operation(summary = "Returns student's marks from all semesters")
     public ResponseEntity<List<JsosSemester>> getStudentMarks(String login, String password)
-            throws LoginException, IOException {
+            throws LoginException {
 
         return ResponseEntity.status(HttpStatus.OK).body(jsosService.getStudentMarks(login, password));
 
@@ -127,14 +127,14 @@ public class JsosAPI {
     @GetMapping("/finanse")
     @Operation(summary = "Return student financial information (paid and unpaid stuff)")
     public ResponseEntity<FinanceResult> getFinanse(@RequestParam("login") String login,
-                                                    @RequestParam("password") String password) throws IOException {
+                                                    @RequestParam("password") String password) {
         return ResponseEntity.status(HttpStatus.OK).body(jsosService.getStudentFinanse(login, password));
     }
 
     @GetMapping("/finanse/operacje")
     @Operation(summary = "Returns all operations registered on student's internal bank account")
     public ResponseEntity<FinanceOperationResult> getFinanceOperations(@RequestParam("login") String login,
-                                                                       @RequestParam("password") String password) throws IOException {
+                                                                       @RequestParam("password") String password) {
         return ResponseEntity.status(HttpStatus.OK).body(jsosService.getStudentFinanceOperations(login, password));
     }
 

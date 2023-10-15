@@ -4,16 +4,16 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
+import dev.wms.pwrapi.dao.auth.AuthDao;
 import dev.wms.pwrapi.entity.jsos.finance.FinanceEntry;
 import dev.wms.pwrapi.entity.jsos.finance.FinanceResult;
 import dev.wms.pwrapi.entity.jsos.finance.operations.OperationEntry;
 import dev.wms.pwrapi.entity.jsos.finance.operations.FinanceOperationResult;
 import dev.wms.pwrapi.entity.jsos.messages.JsosMessageFull;
 import dev.wms.pwrapi.entity.jsos.messages.JsosMessageShort;
-import dev.wms.pwrapi.utils.http.HttpUtils;
-import dev.wms.pwrapi.utils.jsos.JsosHttpUtils;
+import dev.wms.pwrapi.utils.http.HttpClient;
+import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -26,10 +26,10 @@ import dev.wms.pwrapi.utils.generalExceptions.LoginException;
 import okhttp3.OkHttpClient;
 
 @Repository
+@RequiredArgsConstructor
 public class JsosDataDAOImpl implements JsosDataDAO {
 
-
-    //this method could be improved
+    private final AuthDao jsosAuthDao;
 
     /**
      * Returns value of student's message with given internal id's from a given page number
@@ -40,11 +40,11 @@ public class JsosDataDAOImpl implements JsosDataDAO {
      * @return List of JsosMessageFull objects (POJO)
      * @throws IOException When some parsing goes wrong
      */
-    public List<JsosMessageFull> getStudentMessage(String login, String password, int pageNumber, Integer... messageIds) throws IOException {
+    public List<JsosMessageFull> getStudentMessage(String login, String password, int pageNumber, Integer... messageIds) {
 
         List<Integer> messagesIdsToVisit = new ArrayList<>(Arrays.asList(messageIds));
 
-        OkHttpClient client = JsosHttpUtils.getLoggedClient(login, password);
+        HttpClient client = jsosAuthDao.login(login, password);
 
         Document page = getMessagePageWithNumber(pageNumber, client);
 
@@ -77,14 +77,12 @@ public class JsosDataDAOImpl implements JsosDataDAO {
 
         List<String> urlsToVisit = messages.stream()
                 .filter(message -> messagesIdsToVisit.contains(message.getInternalId()))
-                .map(message -> message.getDetailsLink())
-                .collect(Collectors.toList());
+                .map(JsosMessageShort::getDetailsLink).toList();
 
         List<JsosMessageFull> result = new ArrayList<>();
-
         for(String url : urlsToVisit){
 
-            page = HttpUtils.makeRequestWithClientAndGetDocument(client, "https://jsos.pwr.edu.pl" + url);
+            page = client.getDocument("https://jsos.pwr.edu.pl" + url);
 
             List<Element> messageHeaders = page.getElementsByClass("pull-left")
                     .get(1)
@@ -96,7 +94,7 @@ public class JsosDataDAOImpl implements JsosDataDAO {
 
             int urlID = messages.stream()
                     .filter(m -> m.getDetailsLink().equals(url))
-                    .map(m -> m.getInternalId())
+                    .map(JsosMessageShort::getInternalId)
                     .findFirst()
                     .orElseThrow();
 
@@ -111,15 +109,14 @@ public class JsosDataDAOImpl implements JsosDataDAO {
 
         }
 
-
         return result;
 
     }
 
 
-    public List<JsosMessageShort> getStudentMessages(String login, String password, int pageNumber) throws IOException {
+    public List<JsosMessageShort> getStudentMessages(String login, String password, int pageNumber) {
 
-        OkHttpClient client = JsosHttpUtils.getLoggedClient(login, password);
+        HttpClient client = jsosAuthDao.login(login, password);
 
         Document page = getMessagePageWithNumber(pageNumber, client);
 
@@ -152,12 +149,11 @@ public class JsosDataDAOImpl implements JsosDataDAO {
     }
 
 
-    public FinanceOperationResult getStudentFinanceOperations(String login, String password) throws IOException {
+    public FinanceOperationResult getStudentFinanceOperations(String login, String password) {
 
-        OkHttpClient client = JsosHttpUtils.getLoggedClient(login, password);
+        HttpClient client = jsosAuthDao.login(login, password);
 
-        Document page = HttpUtils.makeRequestWithClientAndGetDocument(client,
-                " https://jsos.pwr.edu.pl/index.php/student/finanse/operacje");
+        Document page = client.getDocument("https://jsos.pwr.edu.pl/index.php/student/finanse/operacje");
 
         List<Element> details = page.getElementsByClass("box-body")
                 .first()
@@ -193,23 +189,20 @@ public class JsosDataDAOImpl implements JsosDataDAO {
                     .build();
 
             operations.add(entry);
-            System.out.println("Added " + entry + " to operations");
         }
 
         result.setEntries(operations);
         return result;
     }
 
-    public FinanceResult getStudentFinance(String login, String password) throws IOException {
+    public FinanceResult getStudentFinance(String login, String password) {
 
-        OkHttpClient client = JsosHttpUtils.getLoggedClient(login, password);
+        HttpClient client = jsosAuthDao.login(login, password);
 
-        Document page = HttpUtils.makeRequestWithClientAndGetDocument(client,
-                "https://jsos.pwr.edu.pl/index.php/student/finanse/oplaty");
+        Document page = client.getDocument("https://jsos.pwr.edu.pl/index.php/student/finanse/oplaty");
 
 
         List<Element> rows = page.getElementsByClass("data");
-
         List<FinanceEntry> entries = new ArrayList<>();
 
         for (Element row : rows) {
@@ -245,15 +238,13 @@ public class JsosDataDAOImpl implements JsosDataDAO {
 
 
     @Override
-    public List<JsosSemester> getStudentMarks(String login, String password)
-            throws IOException, LoginException {
+    public List<JsosSemester> getStudentMarks(String login, String password) throws LoginException {
 
         List<JsosSemester> result = new ArrayList<JsosSemester>();
 
-        OkHttpClient client = JsosHttpUtils.getLoggedClient(login, password);
+        HttpClient client = jsosAuthDao.login(login, password);
 
-        Document page = HttpUtils.makeRequestWithClientAndGetDocument(client,
-                "https://jsos.pwr.edu.pl/index.php/student/indeksOceny/oceny/200");
+        Document page = client.getDocument("https://jsos.pwr.edu.pl/index.php/student/indeksOceny/oceny/200");
 
 
         Element table = page.getElementsByTag("table").get(0);
@@ -295,12 +286,11 @@ public class JsosDataDAOImpl implements JsosDataDAO {
     }
 
     @Override
-    public JsosStudentData getStudentData(String login, String password) throws IOException, LoginException {
+    public JsosStudentData getStudentData(String login, String password) throws LoginException {
 
-        OkHttpClient client = JsosHttpUtils.getLoggedClient(login, password);
+        HttpClient client = jsosAuthDao.login(login, password);
 
-        Document page = HttpUtils.makeRequestWithClientAndGetDocument(client,
-                "https://jsos.pwr.edu.pl/index.php/student/indeksDane");
+        Document page = client.getDocument("https://jsos.pwr.edu.pl/index.php/student/indeksDane");
 
         Element table = page.getElementById("design_1");
 
@@ -321,14 +311,12 @@ public class JsosDataDAOImpl implements JsosDataDAO {
     }
 
     @NotNull
-    private Document getMessagePageWithNumber(int pageNumber, OkHttpClient client) throws IOException {
+    private Document getMessagePageWithNumber(int pageNumber, HttpClient client) {
         Document page;
         if(pageNumber == 1){
-            page = HttpUtils.makeRequestWithClientAndGetDocument(client,
-                    "https://jsos.pwr.edu.pl/index.php/student/wiadomosci");
+            page = client.getDocument("https://jsos.pwr.edu.pl/index.php/student/wiadomosci");
         } else {
-            page = HttpUtils.makeRequestWithClientAndGetDocument(client,
-                    "https://jsos.pwr.edu.pl/index.php/student/wiadomosci/" + pageNumber);
+            page = client.getDocument("https://jsos.pwr.edu.pl/index.php/student/wiadomosci/" + pageNumber);
         }
         return page;
     }
